@@ -1,0 +1,66 @@
+﻿@import "color.scss";
+@import "font.scss";
+
+.checkbox__primary-color {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-medium;
+    font-weight: $font-size-medium__height;
+    color: $primary__dark-blue;
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 28px;
+        width: 28px;
+        background-color: $primary__white;
+        border: 2px solid $primary__blue;
+        //rund
+        //border-radius: 50%;
+    }
+
+    input:checked ~ .checkmark {
+        background-color: #00B9EA;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    &:hover input ~ .checkmark {
+        //background-color: #ccc;
+    }
+
+    .checkmark:after {
+        left: 9px;
+        top: 3px;
+        width: 8px;
+        height: 15px;
+        border: solid $primary__white;
+        border-width: 0 2px 2px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    input:checked ~ .checkmark:after {
+        display: block;
+    }
+}

@@ -1,0 +1,56 @@
+﻿@import "grid.scss";
+
+.content-box {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 30px 5% 56px;
+
+    @media (max-width: $medium-width) {
+        padding: 16px 5% 22px;
+    }
+}
+
+.content-box__cards {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 30px 5% 56px;
+
+    @media (max-width: $medium-width) {
+        padding: 16px 5% 22px;
+    }
+
+    @media (min-width: $large-width) {
+        padding: 30px 7% 56px;
+    }
+
+    @media (min-width: $xlarge-width) {
+        padding: 30px 10% 56px;
+    }
+}
+
+.card-container {
+    padding: 30px 5% 56px;
+}
+
+.card-box {
+    max-width: 18rem;
+    border: none !important;
+    text-align: center;
+}
+
+.align_center {
+    align-items: center;
+}
+
+.align_base {
+    align-items: baseline;
+}
+
+.align_end {
+    align-items: flex-end;
+}
+
+.align_start {
+    align-items: flex-start;
+}
+

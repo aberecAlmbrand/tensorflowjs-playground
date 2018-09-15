@@ -1,0 +1,28 @@
+﻿@import "color.scss";
+@import "font.scss";
+
+.select-box {
+    font-family: $font-family-amalia;
+    font-size: 1.2em;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+    color: $primary__dark-blue;
+    display: block;
+    width: 100%;
+    appearance: none;
+    /* SVG background image */
+    padding-right: 1.5em;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 28 28'><polygon fill='#00b9ea' points='12,20.3 2.3,11.7 3.7,10.3 12,17.7 20.3,10.3 21.7,11.7'/></svg>");
+    background-size: 24px;
+    background-position: right;
+    background-repeat: no-repeat;
+    border-width: 0 0 2px 0;
+    border-bottom: solid $primary__dark-blue 2px;
+
+    &:hover {
+        outline: 0;
+        background-color: transparent;
+        border-bottom: solid $primary__blue 2px;
+    }
+}

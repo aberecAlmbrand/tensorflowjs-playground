@@ -1,0 +1,106 @@
+﻿@import "color.scss";
+@import "font.scss";
+
+
+%button-outline {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-xmedium;
+    font-weight: 400;
+    //font-size: .75em;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    white-space: nowrap;
+    padding: .35em 1.5em;
+    text-decoration: none;
+    border-radius: 2em;
+    transition: opacity 15ms ease-in, visibility 1ms 15ms ease-in;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+
+.button__primary__blue__outline {
+    @extend %button-outline;
+    border: 2px solid $primary__blue;
+    background-color: $secondary__blue-light;
+
+    &:hover {
+        //transform: scale(1.05);
+        background-color: $primary__blue;
+        color: $primary__white;
+    }
+
+    &.item-selected {
+        background-color: $primary__blue;
+        color: $primary__white;
+    }
+}
+
+.button__primary__white__outline {
+    @extend %button-outline;
+    border: 2px solid $primary__blue;
+    background-color: $primary__white;
+
+    &:hover {
+        //transform: scale(1.05);
+        background-color: $primary__blue;
+        color: $primary__white;
+    }
+
+    &:visited {
+    }
+}
+
+
+
+
+%button-action {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-xmedium;
+    font-weight: 400;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    padding: 0 24px;
+    border-radius: 2em;
+    user-select: none;
+    transition: background-color .1s ease-in-out;
+    outline: none;
+    cursor: pointer;
+
+    &:hover {
+        //transform: scale(1.05);
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.button__primary__dark-blue {
+    @extend %button-action;
+    height: 60px;
+    color: $primary__white;
+    border: 6px solid $secondary__grey;
+    background-color: $primary__dark-blue;
+}
+
+
+.button__primary__red {
+    @extend %button-action;
+    height: 60px;
+    color: $primary__white;
+    border: 6px solid #f890ad;
+    background-color: $primary__red;
+}
+
+
+

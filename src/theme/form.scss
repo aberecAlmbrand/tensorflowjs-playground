@@ -1,0 +1,47 @@
+﻿@import "color.scss";
+@import "font.scss";
+
+.form__fields__container {
+    margin: .5em 0;
+    position: relative;
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    padding: 0 .5em;
+    /*@include for("desktop-large") {
+        display: flex;
+        flex-flow: wrap;
+    }*/
+    .form__item > input {
+        font-family: $font-family-amalia;
+        font-size: $font-size-xxmedium-desktop;
+        /*@include for("desktop") {
+            font-size: 1.5em;
+        }*/
+        border-bottom: solid $primary__dark-blue 2px;
+        color: $primary__dark-blue;
+        border-radius: 0px 0px;
+        padding-left: 0px;
+    }
+
+    .form__item > input[type=text], input[type=number], input[type=email] {
+        width: 100%;
+        border-width: 0 0 2px 0;
+        background-color: transparent;
+    }
+
+
+    .form__item > input:focus {
+        outline: 0;
+        background-color: transparent;
+        border-bottom: solid $primary__blue 2px;
+    }
+
+
+    .form__item > label {
+        font-family: $font-family-work-sans;
+        font-size: $font-size-medium;
+    }
+}
+
+

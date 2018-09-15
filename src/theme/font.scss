@@ -1,0 +1,183 @@
+﻿@import "grid.scss";
+@import "color.scss";
+
+$font-family-amalia: 'AmaliaPro-Bold', 'Amalia Pro Bold', 'Amalia Pro Normal', 'Amalia Pro';
+
+$font-family-work-sans: 'WorkSans-Regular', 'Work Sans';
+
+
+$font-size-tiny: 11px;
+$font-size-tiny__height: 12px;
+
+$font-size-small: 13px;
+$font-size-small__height: 18px;
+
+$font-size-medium: 14px;
+$font-size-medium__height: 20px;
+
+$font-size-xmedium: 16px;
+$font-size-xmedium__height: 20px;
+
+$font-size-xxmedium-mobile: 16px;
+$font-size-xxmedium-tablet: 17px;
+$font-size-xxmedium-desktop: 18px;
+$font-size-xxmedium__height: 20px;
+
+$font-size-xxxmedium: 20px;
+$font-size-xxxmedium__height: 26px;
+
+$font-size-large-desktop: 30px;
+$font-size-large-tablet: 25px;
+$font-size-large-mobile: 20px;
+$font-size-large__height: 40px;
+
+$font-size-xlarge-desktop: 40px;
+$font-size-xlarge-tablet: 35px;
+$font-size-xlarge-mobile: 30px;
+$font-size-xlarge__height: 50px;
+
+$font-size-xxlarge-desktop: 60px;
+$font-size-xxlarge-tablet: 55px;
+$font-size-xxlarge-mobile: 50px;
+$font-size-xxlarge__height: 70px;
+
+
+
+.primary-font__bold__xxlarge {
+    font-family: $font-family-amalia;
+    font-weight: bold;
+
+    font-size: $font-size-xxlarge-mobile;
+
+    @media (min-width: $medium-width) {
+        font-size: $font-size-xxlarge-tablet;
+    }
+
+    @media (min-width: $large-width) {
+        font-size: $font-size-xxlarge-desktop;
+    }
+
+    line-height: $font-size-xxlarge__height;
+}
+
+.primary-font__bold__xlarge {
+    font-family: $font-family-amalia;
+    font-weight: bold;
+
+    font-size: $font-size-xlarge-mobile;
+
+    @media (min-width: $medium-width) {
+        font-size: $font-size-xlarge-tablet;
+    }
+
+    @media (min-width: $large-width) {
+        font-size: $font-size-xlarge-desktop;
+    }
+
+    line-height: $font-size-xlarge__height
+}
+
+.primary-font__bold__large {
+    font-family: $font-family-amalia;
+    font-weight: bold;
+
+    font-size: $font-size-large-mobile;
+
+    @media (min-width: $medium-width) {
+        font-size: $font-size-large-tablet;
+    }
+
+    @media (min-width: $large-width) {
+        font-size: $font-size-large-desktop;
+    }
+
+    line-height: $font-size-large__height;
+}
+
+.primary-font__bold__medium {
+    font-family: $font-family-amalia;
+    font-weight: bold;
+    font-size: $font-size-xxxmedium;
+    line-height: $font-size-xxxmedium__height;
+}
+/* laver en blå linie under skrift*/
+.primary-font__bold__xxlarge, .primary-font__bold__xlarge, .primary-font__bold__large, .primary-font__bold__medium {
+    &.lineBelow {
+        text-align: center;
+
+        &::after {
+            content: "";
+            display: block;
+            border: none;
+            width: 60px;
+
+            @media (min-width: $medium-width) {
+                width: 80px;
+            }
+
+            height: 2px;
+            margin: 1.15rem auto 1.4rem;
+            background: $primary__blue;
+        }
+    }
+}
+
+
+.secondary-font__bold {
+    font-family: $font-family-work-sans;
+    font-weight: bold;
+    font-size: $font-size-medium;
+    line-height: $font-size-medium__height;
+}
+
+.secondary-font__tiny {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-tiny;
+    line-height: $font-size-tiny__height;
+}
+
+.secondary-font__small {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-small;
+    line-height: $font-size-small__height;
+}
+
+.secondary-font__regular {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-medium;
+    line-height: $font-size-medium__height;
+}
+
+.secondary-font__large {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-xmedium;
+    line-height: $font-size-xmedium__height;
+}
+
+.secondary-font__xlarge {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-xxmedium-mobile;
+
+    @media (min-width: $medium-width) {
+        font-size: $font-size-xxmedium-tablet;
+    }
+
+    @media (min-width: $large-width) {
+        font-size: $font-size-xxmedium-desktop;
+    }
+
+    line-height: $font-size-xxmedium__height;
+}
+
+.secondary-font__large__caps {
+    font-family: $font-family-work-sans;
+    text-transform: uppercase;
+    font-size: $font-size-xmedium;
+    line-height: $font-size-xmedium__height;
+}
+
+.secondary-font__tiny {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-tiny;
+    line-height: $font-size-tiny__height;
+}

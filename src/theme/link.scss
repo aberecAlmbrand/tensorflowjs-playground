@@ -1,0 +1,69 @@
+﻿@import "color.scss";
+@import "grid.scss";
+@import "font.scss";
+
+%linkEffect {
+    &::before {
+        content: "";
+        margin: 0 0 1px 0;
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        bottom: 0;
+        left: 0;
+        background-color: $primary__blue;
+        visibility: hidden;
+        transform: scaleX(0);
+        transition: all 0.2s ease-in-out 0s;
+    }
+
+    &:hover::before {
+        visibility: visible;
+        transform: scaleX(1);
+    }
+}
+
+
+%linkInit {
+    font-family: $font-family-work-sans;
+    font-size: $font-size-xmedium;
+    font-weight: 400;
+    align-items: center;
+    text-decoration: none;
+    padding: .25em 0;
+}
+.url {
+
+    &__link {
+        @extend %linkInit;
+        color: $primary__dark-blue;
+
+        &:hover {
+            text-decoration: underline;
+            color: $primary__blue;
+        }
+    }
+
+    &__menu {
+        @extend %linkInit;
+        color: $primary__blue;
+
+        &:hover {
+            text-decoration: underline;
+            color: $primary__blue;
+        }
+
+        &:visited, &:active, &:focus {
+            text-decoration: none !important;
+            color: $primary__blue !important;
+        }
+    }
+
+    &__link-text {
+        @extend %linkEffect;
+        position: relative;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}
