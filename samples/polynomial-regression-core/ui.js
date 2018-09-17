@@ -78,6 +78,8 @@
 
  export function renderCoefficients(container, coeff) {
    document.querySelector(container).innerHTML =
-       `<span>a=${coeff.a.toFixed(3)}, b=${coeff.b.toFixed(3)}, c=${
-           coeff.c.toFixed(3)},  d=${coeff.d.toFixed(3)}</span>`;
+       `<span>a=${coeff.a.toFixed(3)}, 
+              b=${coeff.b.toFixed(3)}, 
+              c=${coeff.c.toFixed(3)},  
+              d=${coeff.d.toFixed(3)}</span>`;
  }
