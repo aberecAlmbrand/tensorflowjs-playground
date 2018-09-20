@@ -12,9 +12,9 @@ async function buildGraf() {
         yvalues[i] = Math.pow(xvalues[i], 2);
     }
     //row, col
-    const shape = [,10];
-    const _xvalues = tf.tensor1d(xvalues);
-    const _yvalues = tf.tensor1d(yvalues);
+    const shape = [10, 1];
+    const _xvalues = tf.tensor2d(xvalues, shape);
+    const _yvalues = tf.tensor2d(yvalues, shape);
 
     _xvalues.print();
     _yvalues.print();
@@ -44,7 +44,7 @@ async function buildGraf() {
     model.add(output);
 
     // An optimizer using gradient descent
-    const sgdOpt = tf.train.sgd(0.1);
+    const sgdOpt = tf.train.sgd(0.5);
 
     // I'm done configuring the model so compile it
     model.compile({
@@ -54,15 +54,40 @@ async function buildGraf() {
     
     train(model, _xvalues, _yvalues).then(() => {
         let outputs = model.predict(_xvalues);
-        plotDataAndPredictions('#random .plot', _xvalues, _yvalues, outputs);
 
         outputs.print();
         console.log('training complete');
+
+        plotDataAndPredictions('#trained .plot', _xvalues, _yvalues, outputs);
     });
 
 }
 
+/******************************************************************************* */
 
+
+//simpleLinearRegression();
+function simpleLinearRegression(){
+    // Define a model for linear regression.
+    const model = tf.sequential();
+    model.add(tf.layers.dense({units: 1, inputShape: [1]}));
+    
+    // Prepare the model for training: Specify the loss and the optimizer.
+    model.compile({loss: 'meanSquaredError', optimizer: 'sgd'});
+    
+    // Generate some synthetic data for training.
+    const xs = tf.tensor2d([1, 2, 3, 4], [4, 1]);
+    const ys = tf.tensor2d([1, 3, 5, 7], [4, 1]);
+
+    xs.print();
+    ys.print();
+    
+    // Train the model using the data.
+    model.fit(xs, ys, {epochs: 10}).then(() => {
+        // Use the model to do inference on a data point the model hasn't seen before:
+        (model.predict(tf.tensor2d([5], [1, 1]))).print();
+    });
+}
 
 
 
@@ -177,7 +202,7 @@ function linearRegression(){
 }
 
 async function train(model, xs, ys) {
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 100; i++) {
     const config = {
       shuffle: true,
       epochs: 10
