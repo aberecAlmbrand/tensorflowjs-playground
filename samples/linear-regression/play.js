@@ -3,7 +3,21 @@ import {generateData} from './data';
 import {plotData, plotDataAndPredictions, renderCoefficients} from './ui';
 
 
-simpleTensors();
+buildGraf();
+async function buildGraf() {
+    const values = [];
+    for(let i = 0; i < 15; i++){
+        values[i] = Math.random() * 100;
+    }
+    //row, col
+    const shape = [5, 3];
+    const data = tf.tensor2d(values, shape);
+
+    await plotData('#data .plot', data, data);
+}
+
+
+//simpleTensors();
 function simpleTensors(){
 
     const values = [];
@@ -15,6 +29,7 @@ function simpleTensors(){
     const data = tf.tensor2d(values, shape);
     data.print();
 
+    //await plotData('#data .plot', trainingData.xs, trainingData.ys)
 
     const values2 = [];
     for(let i = 0; i < 30; i++){
