@@ -8,8 +8,8 @@ async function buildGraf() {
     const xvalues = [];
     const yvalues = [];
     for(let i = 0; i < 10; i++){
-        xvalues[i] = Math.random() * 100;
-        yvalues[i] = Math.pow(xvalues[i], 2);
+        xvalues[i] = Math.random();
+        yvalues[i] = xvalues[i] + 0.1;
     }
     //row, col
     const shape = [10, 1];
@@ -202,7 +202,7 @@ function linearRegression(){
 }
 
 async function train(model, xs, ys) {
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 300; i++) {
     const config = {
       shuffle: true,
       epochs: 10
