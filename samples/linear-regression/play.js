@@ -7,52 +7,10 @@ const MODEL_SAVE_PATH_ = "localstorage://my-model-1";
 
 let _xvalues, _yvalues;
 
-//buildPolynomialDataSet();
-async function buildPolynomialDataSet(){
-    const trueCoefficients = {a: -.8, b: -.2, c: .9, d: .5};
-    const trainingData = generateData(10, trueCoefficients);
-
-    let tmpXvalues = await trainingData.xs;
-    let tmpYvalues = await trainingData.ys;
-
-    _xvalues = tf.reshape(tmpXvalues, [10, 1])
-    _yvalues = tf.reshape(tmpYvalues, [10, 1])
-
-    _xvalues.print();
-    _yvalues.print();
-    console.log('values before prediction');
-}
-
-
-//simpleTensors();
-function simpleTensors() {
-
-    const values = [];
-    for (let i = 0; i < 15; i++) {
-        values[i] = Math.random() * 100;
-    }
-    //row, col
-    const shape = [5, 3];
-    const data = tf.tensor2d(values, shape);
-    data.print();
-
-    const values2 = [];
-    for (let i = 0; i < 30; i++) {
-        values2[i] = Math.random() * 100;
-    }
-    //matrix, row, col
-    const shape2 = [2, 5, 3];
-    const data2 = tf.tensor3d(values2, shape2);
-    data2.print();
-
-
-    tf.tensor3d([[[1], [2]], [[3], [4]]]).print();
-
-    tf.tensor3d([1, 2, 3, 4], [2, 2, 1]).print();
-}
-
-//myFirstTfjs();
-async function myFirstTfjs() {
+/*********************************** */
+trainModelAndBuildLinearGraf();
+/*********************************** */
+async function trainModelAndBuildLinearGraf() {
     // simpel neural model
     const model = tf.sequential();
     model.add(tf.layers.dense({units: 1, inputShape: [1]}));
@@ -80,7 +38,11 @@ async function myFirstTfjs() {
 
             predictedValues.print();
 
-            plotDataAndPredictionsMark('#trained .plot', xs, ys, predictX, predictedValues);
+            plotDataAndPredictionsMark('#trained .plot', xs, ys, predictX, predictedValues).then(()=>{
+                xs.dispose();
+                ys.dispose();
+                predictedValues.dispose();
+            });
         })
     };
 
@@ -88,10 +50,13 @@ async function myFirstTfjs() {
   }
 
 
-trainModelAndBuildGraf();
-async function trainModelAndBuildGraf() {
 
-    await buildPolynomialDataSet();
+/*********************************** */
+//trainModelAndBuildPolynomialGraf();
+/*********************************** */
+async function trainModelAndBuildPolynomialGraf() {
+
+    await buildPolynomialDataSet(20);
 
     //removeModel();
 
@@ -128,22 +93,32 @@ async function trainModelAndBuildGraf() {
         loss: tf.losses.meanSquaredError
     });
 
-    train(model, _xvalues, _yvalues).then(() => {
-        //model er trænet => forudsig x værdier
-        let predictedValues = model.predict(_xvalues);
-
-        _xvalues.print();
-        predictedValues.print();
-        console.log('training complete');
-
-        plotDataAndPredictions('#trained .plot', _xvalues, _yvalues, predictedValues);
-
-        //gem model i browser og hent det frem senere
-        saveModel(model).then((result) =>{
-            const saveResult = result;
-            console.log(saveResult);
+    var button = document.createElement('button');
+    button.innerHTML = 'Træn neural netværk';
+    button.onclick = function(){
+        train(model, _xvalues, _yvalues).then(() => {
+            //model er trænet => forudsig x værdier
+            let predictedValues = model.predict(_xvalues);
+    
+            _xvalues.print();
+            predictedValues.print();
+            console.log('training complete');
+    
+            plotDataAndPredictions('#trained .plot', _xvalues, _yvalues, predictedValues).then(()=>{
+                _xvalues.dispose();
+                _yvalues.dispose();
+                predictedValues.dispose();
+            })
+    
+            //gem model i browser og hent det frem senere
+            saveModel(model).then((result) =>{
+                const saveResult = result;
+                console.log(saveResult);
+            });
         });
-    });
+    };
+
+    document.getElementById('foobutton').appendChild(button);
 
 }
 //træn model
@@ -151,7 +126,7 @@ async function train(model, xs, ys) {
     for (let i = 0; i < 100; i++) {
         const config = {
             shuffle: true,
-            epochs: 10
+            epochs: 20
         }
         //læg data i model og vent på at Tensorflow bliver færdig med forudsigelse
         const response = await model.fit(xs, ys, config);
@@ -160,6 +135,47 @@ async function train(model, xs, ys) {
     }
 }
 
+async function buildPolynomialDataSet(count){
+    const trueCoefficients = {a: -.8, b: -.2, c: .9, d: .5};
+    const trainingData = generateData(count, trueCoefficients);
+
+    let tmpXvalues = await trainingData.xs;
+    let tmpYvalues = await trainingData.ys;
+
+    _xvalues = tf.reshape(tmpXvalues, [count, 1])
+    _yvalues = tf.reshape(tmpYvalues, [count, 1])
+
+    _xvalues.print();
+    _yvalues.print();
+    console.log('values before prediction');
+}
+
+//simpleTensors();
+function simpleTensors() {
+
+    const values = [];
+    for (let i = 0; i < 15; i++) {
+        values[i] = Math.random() * 100;
+    }
+    //row, col
+    const shape = [5, 3];
+    const data = tf.tensor2d(values, shape);
+    data.print();
+
+    const values2 = [];
+    for (let i = 0; i < 30; i++) {
+        values2[i] = Math.random() * 100;
+    }
+    //matrix, row, col
+    const shape2 = [2, 5, 3];
+    const data2 = tf.tensor3d(values2, shape2);
+    data2.print();
+
+
+    tf.tensor3d([[[1], [2]], [[3], [4]]]).print();
+
+    tf.tensor3d([1, 2, 3, 4], [2, 2, 1]).print();
+}
 
 
 //loadModalAndBuildGraf();
