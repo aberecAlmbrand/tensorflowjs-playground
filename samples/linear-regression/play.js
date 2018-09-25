@@ -12,13 +12,13 @@ for (let i = 0; i < 10; i++) {
     yvalues[i] = xvalues[i] + 0.1;
 }
 //row, col
-const shape = [10, 1];
-let _xvalues = tf.tensor2d(xvalues, shape);
-let _yvalues = tf.tensor2d(yvalues, shape);
+//const shape = [10, 1];
+//let _xvalues = tf.tensor2d(xvalues, shape);
+//let _yvalues = tf.tensor2d(yvalues, shape);
 
-//let _xvalues, _yvalues;
+let _xvalues, _yvalues;
 
-buildPolynomialModel();
+//buildPolynomialModel();
 async function buildPolynomialModel(){
     const trueCoefficients = {a: -.8, b: -.2, c: .9, d: .5};
     const trainingData = generateData(10, trueCoefficients);
@@ -26,16 +26,8 @@ async function buildPolynomialModel(){
     let tmpXvalues = await trainingData.xs;
     let tmpYvalues = await trainingData.ys;
 
-    for (let i = 0; i < 10; i++) {
-        xvalues[i] = tmpXvalues[i];
-    }
-
-    for (let i = 0; i < 10; i++) {
-        yvalues[i] = tmpYvalues[i];
-    }
-
-    let _xvalues = tf.tensor2d(xvalues, shape);
-    let _yvalues = tf.tensor2d(yvalues, shape);
+    _xvalues = tf.reshape(tmpXvalues, [10, 1])
+    _yvalues = tf.reshape(tmpYvalues, [10, 1])
 
     _xvalues.print();
     _yvalues.print();
@@ -94,10 +86,10 @@ async function myFirstTfjs() {
   }
 
 
-//trainModelAndBuildGraf();
+trainModelAndBuildGraf();
 async function trainModelAndBuildGraf() {
 
-    //buildPolynomialModel();
+    await buildPolynomialModel();
 
     //removeModel();
 
@@ -154,7 +146,7 @@ async function trainModelAndBuildGraf() {
 }
 //træn model
 async function train(model, xs, ys) {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 100; i++) {
         const config = {
             shuffle: true,
             epochs: 10
