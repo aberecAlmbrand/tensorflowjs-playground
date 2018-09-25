@@ -8,7 +8,7 @@ const MODEL_SAVE_PATH_ = "localstorage://my-model-1";
 let _xvalues, _yvalues;
 
 /*********************************** */
-trainModelAndBuildLinearGraf();
+//trainModelAndBuildLinearGraf();
 /*********************************** */
 async function trainModelAndBuildLinearGraf() {
     // simpel neural model
@@ -52,7 +52,7 @@ async function trainModelAndBuildLinearGraf() {
 
 
 /*********************************** */
-//trainModelAndBuildPolynomialGraf();
+trainModelAndBuildPolynomialGraf();
 /*********************************** */
 async function trainModelAndBuildPolynomialGraf() {
 
@@ -123,13 +123,19 @@ async function trainModelAndBuildPolynomialGraf() {
 }
 //træn model
 async function train(model, xs, ys) {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 500; i++) {
         const config = {
             shuffle: true,
             epochs: 20
         }
         //læg data i model og vent på at Tensorflow bliver færdig med forudsigelse
         const response = await model.fit(xs, ys, config);
+
+        if(i%10 === 0){
+            let predictedValues = model.predict(xs);
+            plotDataAndPredictions('#trained .plot', xs, ys, predictedValues)
+        }
+
         //print loss så man kan se at forudsigelsen bliver forbedret
         console.log(response.history.loss[0] + " => "+i);
     }
