@@ -3,53 +3,38 @@
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.cyan-teal.min.css" />
   </head>
   <body>
-    <h3>TensorFlow.js Play</h3>
+    <h3>Polynomial regression</h3>
     <style>
       body {
         padding: 50px;
       }
 
-      .plots {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
+
 
       #data, #random, #trained {
-        margin: 30px;
+
       }
 
       .caption {
        font-weight: bold;
       }
 
-      .coeff {
-        font-weight: normal;
-      }
+    
 
     </style>
 
     <div class="plots">
-        <div class="caption">Linear regression</div>
+
+      <div class="caption">Polynomial regression før træning</div>
       <div id="data">
         <div class="plot"></div>
       </div>
-      <!--
-      <div id="random">
-        <div class="caption">Fit curve with random coefficients (before training)</div>
-        <div class="caption">Random coefficients:
-          <span class='coeff'></span>
-        </div>
-        <div class="plot"></div>
-      </div>
-    -->
+      <br /><br />
+      <div class="caption">Polynomial regression efter træning med Tensorflow forudsigelser</div>
       <div id="trained">
-        <div class="caption">Fit curve with learned coefficients (after training)</div>
-        <div class="caption">Learned coefficients:
-          <span class='coeff'></span>
-        </div>
         <div class="plot"></div>
       </div>
+
     </div>
 
 
