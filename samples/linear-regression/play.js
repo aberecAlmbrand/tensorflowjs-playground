@@ -1,25 +1,14 @@
 import * as tf from '@tensorflow/tfjs';
 import {generateData} from './data';
-import {plotData, plotDataAndPredictions, renderCoefficients} from './ui';
+import {plotData, plotDataAndPredictions, plotDataAndPredictionsMark} from './ui';
 
 
 const MODEL_SAVE_PATH_ = "localstorage://my-model-1";
 
-const xvalues = [];
-const yvalues = [];
-for (let i = 0; i < 10; i++) {
-    xvalues[i] = Math.random();
-    yvalues[i] = xvalues[i] + 0.1;
-}
-//row, col
-//const shape = [10, 1];
-//let _xvalues = tf.tensor2d(xvalues, shape);
-//let _yvalues = tf.tensor2d(yvalues, shape);
-
 let _xvalues, _yvalues;
 
-//buildPolynomialModel();
-async function buildPolynomialModel(){
+//buildPolynomialDataSet();
+async function buildPolynomialDataSet(){
     const trueCoefficients = {a: -.8, b: -.2, c: .9, d: .5};
     const trainingData = generateData(10, trueCoefficients);
 
@@ -75,21 +64,34 @@ async function myFirstTfjs() {
     });
   
     // test data med formlen y = 2x - 1
-    const xs = tf.tensor2d([-1, 0, 1, 2, 3, 4], [6, 1]);
-    const ys = tf.tensor2d([-3, -1, 1, 3, 5, 7], [6, 1]);
-  
-    // træn neural model, gentag 250 gange
-    await model.fit(xs, ys, {epochs: 250});
-  
-    //Få tensorflow til at forudsige y værdien udfra x på 20 => 39 = 2 * 20 - 1
-    model.predict(tf.tensor2d([20], [1, 1])).print();
+    const xs = tf.tensor2d([-1, 0, 1, 2, 3, 4, 6, 7, 8, 9], [10, 1]);
+    const ys = tf.tensor2d([-3, -1, 1, 3, 5, 7, 11, 13, 15, 17], [10, 1]);
+
+    await plotData('#data .plot', xs, ys);
+
+    var button = document.createElement('button');
+    button.innerHTML = 'Træn neural netværk';
+    button.onclick = function(){
+        // træn neural model, gentag 250 gange
+        model.fit(xs, ys, {epochs: 250}).then(()=>{
+            let predictX = 5;
+            //Få tensorflow til at forudsige y værdien udfra x på 5 => 9 = 2 * 5 - 1
+            let predictedValues = model.predict(tf.tensor2d([predictX], [1, 1]));
+
+            predictedValues.print();
+
+            plotDataAndPredictionsMark('#trained .plot', xs, ys, predictX, predictedValues);
+        })
+    };
+
+    document.getElementById('foobutton').appendChild(button);
   }
 
 
 trainModelAndBuildGraf();
 async function trainModelAndBuildGraf() {
 
-    await buildPolynomialModel();
+    await buildPolynomialDataSet();
 
     //removeModel();
 
@@ -162,6 +164,9 @@ async function train(model, xs, ys) {
 
 //loadModalAndBuildGraf();
 async function loadModalAndBuildGraf(){
+    
+    await buildPolynomialDataSet();
+
     loadModel().then(model =>{
         let predictedValues = model.predict(_xvalues);
 
@@ -172,11 +177,6 @@ async function loadModalAndBuildGraf(){
         plotDataAndPredictions('#trained .plot', _xvalues, _yvalues, predictedValues);
     });
 }
-
-
-  async function saveModel(model) {
-    return await model.save(MODEL_SAVE_PATH_);
-  }
 
 
   async function loadModel() {
@@ -191,16 +191,32 @@ async function loadModalAndBuildGraf(){
     }
   }
 
+  async function saveModel(model) {
+    return await model.save(MODEL_SAVE_PATH_);
+  }
+
 
   async function checkStoredModelStatus() {
     const modelsInfo = await tf.io.listModels();
     return modelsInfo[MODEL_SAVE_PATH_];
   }
 
-
   async function removeModel() {
     return await tf.io.removeModel(MODEL_SAVE_PATH_);
   }
+
+
+  /*
+const xvalues = [];
+const yvalues = [];
+for (let i = 0; i < 10; i++) {
+    xvalues[i] = Math.random();
+    yvalues[i] = xvalues[i] + 0.1;
+}
+//row, col
+const shape = [10, 1];
+let _xvalues = tf.tensor2d(xvalues, shape);
+let _yvalues = tf.tensor2d(yvalues, shape);*/
 
 
 

@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.cyan-teal.min.css" />
   </head>
   <body>
-    <h3>Polynomial regression</h3>
+    <h3>Linear/Polynomial regression</h3>
     <style>
       body {
         padding: 50px;
@@ -25,12 +25,16 @@
 
     <div class="plots">
 
-      <div class="caption">Polynomial regression før træning</div>
+      <div class="caption">Linear/Polynomial regression før træning</div>
       <div id="data">
         <div class="plot"></div>
       </div>
-      <br /><br />
-      <div class="caption">Polynomial regression efter træning med Tensorflow forudsigelser</div>
+
+      <br />
+      <div id="foobutton"></div>
+      <br />
+      
+      <div class="caption">Linear/Polynomial regression efter træning med Tensorflow forudsigelse(r)</div>
       <div id="trained">
         <div class="plot"></div>
       </div>
