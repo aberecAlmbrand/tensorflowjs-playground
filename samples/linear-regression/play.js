@@ -8,7 +8,7 @@ const MODEL_SAVE_PATH_ = "localstorage://my-model-1";
 let _xvalues, _yvalues;
 
 /*********************************** */
-//trainModelAndBuildLinearGraf();
+trainModelAndBuildLinearGraf();
 /*********************************** */
 async function trainModelAndBuildLinearGraf() {
     // simpel neural model
@@ -47,12 +47,14 @@ async function trainModelAndBuildLinearGraf() {
     };
 
     document.getElementById('foobutton').appendChild(button);
+
+    //console.log("tensors "+tf.memory().numTensors);
   }
 
 
 
 /*********************************** */
-trainModelAndBuildPolynomialGraf();
+//trainModelAndBuildPolynomialGraf();
 /*********************************** */
 async function trainModelAndBuildPolynomialGraf() {
 
@@ -85,7 +87,7 @@ async function trainModelAndBuildPolynomialGraf() {
     model.add(output);
 
     // Optimizer med gradient descent
-    const sgdOpt = tf.train.sgd(0.2);
+    const sgdOpt = tf.train.sgd(0.1);
 
     //færdig med config => compile model
     model.compile({
@@ -119,11 +121,10 @@ async function trainModelAndBuildPolynomialGraf() {
     };
 
     document.getElementById('foobutton').appendChild(button);
-
 }
 //træn model
 async function train(model, xs, ys) {
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 5000; i++) {
         const config = {
             shuffle: true,
             epochs: 20
@@ -133,11 +134,14 @@ async function train(model, xs, ys) {
 
         if(i%10 === 0){
             let predictedValues = model.predict(xs);
-            plotDataAndPredictions('#trained .plot', xs, ys, predictedValues)
+            plotDataAndPredictions('#trained .plot', xs, ys, predictedValues).then(()=>{
+                predictedValues.dispose();
+            })
         }
 
         //print loss så man kan se at forudsigelsen bliver forbedret
         console.log(response.history.loss[0] + " => "+i);
+        //console.log("tensors "+tf.memory().numTensors);
     }
 }
 
