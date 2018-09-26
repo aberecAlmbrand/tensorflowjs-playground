@@ -85,9 +85,9 @@ async function trainModelAndBuildPolynomialGraf() {
     model.add(output);
 
     // Optimizer med gradient descent
-    const sgdOpt = tf.train.sgd(0.5);
+    const sgdOpt = tf.train.sgd(0.2);
 
-    // I'm done configuring the model so compile it
+    //færdig med config => compile model
     model.compile({
         optimizer: sgdOpt,
         loss: tf.losses.meanSquaredError
