@@ -15,7 +15,7 @@ const mobilenetDemo = async () => {
 
   mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
 
-
+  //1 billede af 224x224 pixels i RGB (3 channels),
   mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])).dispose();
 
   status('');
@@ -56,6 +56,7 @@ async function predict(imgElement) {
     normalized.print();
 
     // Reshape to a single-element batch so we can pass it to predict.
+    //1 billede af 224x224 pixels i RGB (3 channels),
     const batched = normalized.reshape([1, IMAGE_SIZE, IMAGE_SIZE, 3]);
 
     batched.print();
