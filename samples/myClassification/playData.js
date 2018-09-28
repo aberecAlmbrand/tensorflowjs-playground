@@ -22,11 +22,11 @@ const NUM_DATASET_ELEMENTS = 65000;
 const NUM_TRAIN_ELEMENTS = 55000;
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS;
 
-//const MNIST_IMAGES_SPRITE_PATH = 'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png';
+const MNIST_IMAGES_SPRITE_PATH = 'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png';
 const MNIST_LABELS_PATH =
     'https://storage.googleapis.com/learnjs-data/model-builder/mnist_labels_uint8';
 
-const MNIST_IMAGES_SPRITE_PATH = "download.png";
+//const MNIST_IMAGES_SPRITE_PATH = "download.png";
 
 
 /**
@@ -74,7 +74,9 @@ export class MnistData {
 
         resolve();
       };
-      img.src = this.loadBytes(MNIST_IMAGES_SPRITE_PATH, false);
+      //img.src = MNIST_IMAGES_SPRITE_PATH;
+      //img.src = document.getElementById("download");
+
     });
 
     const labelsRequest = fetch(MNIST_LABELS_PATH);
