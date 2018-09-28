@@ -1,19 +1,4 @@
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
+
 
 /**
  * 
@@ -37,10 +22,12 @@ const NUM_DATASET_ELEMENTS = 65000;
 const NUM_TRAIN_ELEMENTS = 55000;
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS;
 
-const MNIST_IMAGES_SPRITE_PATH =
-    'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png';
+//const MNIST_IMAGES_SPRITE_PATH = 'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png';
 const MNIST_LABELS_PATH =
     'https://storage.googleapis.com/learnjs-data/model-builder/mnist_labels_uint8';
+
+const MNIST_IMAGES_SPRITE_PATH = "download.png";
+
 
 /**
  * A class that fetches the sprited MNIST dataset and provide data as
@@ -87,7 +74,7 @@ export class MnistData {
 
         resolve();
       };
-      img.src = MNIST_IMAGES_SPRITE_PATH;
+      img.src = this.loadBytes(MNIST_IMAGES_SPRITE_PATH, false);
     });
 
     const labelsRequest = fetch(MNIST_LABELS_PATH);
@@ -105,6 +92,24 @@ export class MnistData {
     this.testLabels =
         this.datasetLabels.slice(NUM_CLASSES * NUM_TRAIN_ELEMENTS);
   }
+
+  
+  loadBytes(file, callback) {
+    var data = {};
+    var oReq = new XMLHttpRequest();
+    oReq.open("GET", file, true);
+    oReq.responseType = "arraybuffer";
+    oReq.onload = function(oEvent) {
+      var arrayBuffer = oReq.response;
+      if (arrayBuffer) {
+        data.bytes = new Uint8Array(arrayBuffer);
+        if (callback) {
+          callback(data);
+        }
+      }
+    }
+    return data;
+}
 
   /**
    * Get all training data as a data tensor and a labels tensor.
