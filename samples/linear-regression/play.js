@@ -8,7 +8,7 @@ const MODEL_SAVE_PATH_ = "localstorage://my-model-1";
 let _xvalues, _yvalues;
 
 /*********************************** */
-trainModelAndBuildLinearGraf();
+//trainModelAndBuildLinearGraf();
 /*********************************** */
 async function trainModelAndBuildLinearGraf() {
     // simpel neural model
@@ -232,17 +232,53 @@ async function loadModalAndBuildGraf(){
   }
 
 
-  /*
-const xvalues = [];
-const yvalues = [];
-for (let i = 0; i < 10; i++) {
-    xvalues[i] = Math.random();
-    yvalues[i] = xvalues[i] + 0.1;
-}
-//row, col
-const shape = [10, 1];
-let _xvalues = tf.tensor2d(xvalues, shape);
-let _yvalues = tf.tensor2d(yvalues, shape);*/
+/*********************************** */
+//trainModelAndBuildLinearGraf2();
+/*********************************** */
+async function trainModelAndBuildLinearGraf2() {
+    // simpel neural model
+    const model = tf.sequential();
+    model.add(tf.layers.dense({units: 2, inputShape: [2]}));
+    
+    //definer loss metode og optimizer til neural model
+    model.compile({
+      loss: 'meanSquaredError',
+      optimizer: 'sgd'
+    });
+  
+    // test data med formlen y = 2x - 1
+    const xs = tf.tensor2d([-1, 0, 1, 2, 3, 4, 6, 7, 8, 9, -1, 0, 1, 2, 3, 4, 6, 7, 8, 9], [10, 2]);
+    const ys = tf.tensor2d([-3, -1, 1, 3, 5, 7, 11, 13, 15, 17, -6, -3, 0, 3, 6, 9, 15, 18, 21, 24], [10, 2]);
+
+    // test data med formlen y = 3x - 3
+    //const xs = tf.tensor2d([-1, 0, 1, 2, 3, 4, 6, 7, 8, 9], [10, 1]);
+    //const ys = tf.tensor2d([-6, -3, 0, 3, 6, 9, 15, 18, 21, 24], [10, 1]);
+
+    await plotData('#data .plot', xs, ys);
+
+    var button = document.createElement('button');
+    button.innerHTML = 'Træn neural netværk';
+    button.onclick = function(){
+        // træn neural model, gentag 250 gange
+        model.fit(xs, ys, {epochs: 250}).then(()=>{
+            let predictX = 5;
+            //Få tensorflow til at forudsige y værdien udfra x på 5 => 9 = 2 * 5 - 1
+            let predictedValues = model.predict(tf.tensor2d([predictX, predictX], [1, 2]));
+
+            predictedValues.print();
+
+            plotDataAndPredictionsMark('#trained .plot', xs, ys, predictX, predictedValues).then(()=>{
+                xs.dispose();
+                ys.dispose();
+                predictedValues.dispose();
+            });
+        })
+    };
+
+    document.getElementById('foobutton').appendChild(button);
+
+    //console.log("tensors "+tf.memory().numTensors);
+  }
 
 
 
