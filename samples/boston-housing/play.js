@@ -56,24 +56,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         'Data is now available as tensors.\n' +
         'Click a train button to begin.');
 
+    tensors.rawTrainFeatures.print();
 
-    /*const x = tf.tensor1d([1, 2, 3, 4]);
-    x.slice([0]).print(); 
-    x.slice([1]).print(); 
-    x.slice(0).print(); 
-    x.slice([1], [2]).print();   */
-    
-    const x2 = tf.tensor2d([1, 2, 3, 4], [2, 2]);
-    x2.slice([1, 0]).print();
-    x2.slice([1, 0], [1, 2]).print();
+/*
+    let sliced4 = tensors.rawTrainFeatures.slice([0]);
+    sliced4.print(); 
+    let sliced5 = tensors.rawTrainFeatures.slice([11]);
+    sliced5.print(); */
 
-  let sliced = tensors.rawTrainFeatures.slice([0, 11]); 
+  let sliced = tensors.rawTrainFeatures.slice([0, 0], 1); 
   sliced.print();
    await plotDataSimple('#data .plot', sliced, tensors.trainTarget);
-  let sliced2 = tensors.rawTrainFeatures.slice([1, 11]); 
+
+  let sliced2 = tensors.rawTrainFeatures.slice([1, 0], 1); 
   sliced2.print();
   await plotDataSimple('#data .plot2', sliced2, tensors.trainTarget);
-  let sliced3 = tensors.rawTrainFeatures.slice([2, 11]); 
+
+  let sliced3 = tensors.rawTrainFeatures.slice([2, 0], 1); 
   sliced3.print();
   await plotDataSimple('#data .plot3', sliced3, tensors.trainTarget);
 
