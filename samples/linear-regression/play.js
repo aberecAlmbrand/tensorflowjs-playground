@@ -185,6 +185,14 @@ function simpleTensors() {
     tf.tensor3d([[[1], [2]], [[3], [4]]]).print();
 
     tf.tensor3d([1, 2, 3, 4], [2, 2, 1]).print();
+
+    const x = tf.tensor2d([1, 2, 3, 4, 5, 6, 7, 8, 9, 10 , 11, 12,1, 2, 3, 4, 5, 6, 7, 8, 9, 10 , 11, 12], [2, 12]);
+    x.print();
+    x.slice([0, 0], 1).print();
+
+    const Y = tf.tensor2d([1, 2, 3, 4, 5, 6, 7, 8, 9, 10 , 11, 12,2, 1, 3, 4, 5, 6, 7, 8, 9, 10 , 11, 12], [2, 12]);    
+    Y.print();
+    Y.slice([1, 0], 1).print();
 }
 
 
