@@ -4,7 +4,8 @@ import {IMAGENET_CLASSES} from './imagenet_classes';
 
 const MOBILENET_MODEL_PATH =
     // tslint:disable-next-line:max-line-length
-    'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
+    //'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
+    'data/quickdraw/model/model.json';
 
 const IMAGE_SIZE = 224;
 const TOPK_PREDICTIONS = 10;
@@ -13,26 +14,32 @@ let mobilenet;
 const mobilenetDemo = async () => {
   status('Loading model...');
 
-  mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
+  document.addEventListener("DOMContentLoaded", async function(){
 
-  //1 billede af 224x224 pixels i RGB (3 channels),
-  mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])).dispose();
+    mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
 
-  status('');
+    //1 billede af 224x224 pixels i RGB (3 channels),
+    mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])).dispose();
+
+    status('');
 
 
-  const catElement = document.getElementById('cat');
-  if (catElement.complete && catElement.naturalHeight !== 0) {
-    predict(catElement);
-    catElement.style.display = '';
-  } else {
-    catElement.onload = () => {
+    const catElement = document.getElementById('cat');
+    if (catElement.complete && catElement.naturalHeight !== 0) {
       predict(catElement);
       catElement.style.display = '';
+    } else {
+      catElement.onload = () => {
+        predict(catElement);
+        catElement.style.display = '';
+      }
     }
-  }
 
-  document.getElementById('file-container').style.display = '';
+    document.getElementById('file-container').style.display = '';
+
+  });
+
+
 };
 
 /**
