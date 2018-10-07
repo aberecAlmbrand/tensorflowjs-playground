@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Welcome to Vue</title>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
+</head>
+<body>
+  <div id="app">
+    <img src="https://vuejs.org/images/logo.png" alt="Vue logo">
+    <h1>\{{ greeting }}</h1>
+    <ul>
+      <li>
+        To learn more about Vue, visit
+        <a :href="docsURL" target="_blank">
+          \{{ humanizeURL(docsURL) }}
+        </a>
+      </li>
+      <li>
+        For live help with simple questions, check out
+        <a :href="discordURL" target="_blank">
+          the Discord chat
+        </a>
+      </li>
+      <li>
+        For more complex questions, post to
+        <a :href="forumURL" target="_blank">
+          the forum
+        </a>
+      </li>
+    </ul>
+
+    <div class="fb-page" data-href="https://www.facebook.com/weaponscombatsystems/?ref=bookmarks" data-tabs="timeline" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/weaponscombatsystems/?ref=bookmarks" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/weaponscombatsystems/?ref=bookmarks">Weapons Combat Systems</a></blockquote></div>
+
+
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        greeting: 'Welcome to your Vue.js app!',
+        docsURL: 'http://vuejs.org/guide/',
+        discordURL: 'https://chat.vuejs.org',
+        forumURL: 'http://forum.vuejs.org/'
+      },
+      methods: {
+        humanizeURL: function (url) {
+          return url
+            .replace(/^https?:\/\//, '')
+            .replace(/\/$/, '')
+        }
+        ,
+        async start() {
+
+            
+            //load the model 
+            model = await tf.loadModel('http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/model2/model.json')
+
+            //warm up 
+            model.predict(tf.zeros([1, 28, 28, 1]))
+
+
+            //load the class names
+            await this.loadDict()
+        },
+
+        async loadDict() {
+            loc = 'model2/class_names.txt'
+
+            /*await $.ajax({
+                url: loc,
+                dataType: 'text',
+            }).done(success);*/
+        }
+      },
+      mounted(){
+            console.log("mounted");
+
+            this.start();
+
+      },
+
+    })
+  </script>
+</body>
+</html>

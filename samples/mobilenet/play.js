@@ -5,10 +5,11 @@ import {IMAGENET_CLASSES} from './imagenet_classes';
 const MOBILENET_MODEL_PATH =
     // tslint:disable-next-line:max-line-length
     //'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
-    'data/quickdraw/model/model.json';
+    'http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/model2/model.json';
 
-const IMAGE_SIZE = 224;
+const IMAGE_SIZE = 28;//224;
 const TOPK_PREDICTIONS = 10;
+const COLOR = 1;
 
 let mobilenet;
 const mobilenetDemo = async () => {
@@ -19,7 +20,7 @@ const mobilenetDemo = async () => {
     mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
 
     //1 billede af 224x224 pixels i RGB (3 channels),
-    mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])).dispose();
+    mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, COLOR])).dispose();
 
     status('');
 
@@ -41,6 +42,8 @@ const mobilenetDemo = async () => {
 
 
 };
+
+
 
 /**
  * Given an image element, makes a prediction through mobilenet returning the
@@ -64,7 +67,7 @@ async function predict(imgElement) {
 
     // Reshape to a single-element batch so we can pass it to predict.
     //1 billede af 224x224 pixels i RGB (3 channels),
-    const batched = normalized.reshape([1, IMAGE_SIZE, IMAGE_SIZE, 3]);
+    const batched = normalized.reshape([1, IMAGE_SIZE, IMAGE_SIZE, COLOR]);
 
     batched.print();
 
