@@ -1,6 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 
 import {IMAGENET_CLASSES} from './imagenet_classes';
+import {ControllerDataset} from './controller_dataset';
 
 const MOBILENET_MODEL_PATH =
     // tslint:disable-next-line:max-line-length
@@ -10,6 +11,10 @@ const MOBILENET_MODEL_PATH =
 const IMAGE_SIZE = 224;
 const TOPK_PREDICTIONS = 10;
 const COLOR = 3;
+const NUM_CLASSES = 2;
+
+// The dataset object where we will store activations.
+const controllerDataset = new ControllerDataset(NUM_CLASSES);
 
 let mobilenet;
 const mobilenetDemo = async () => {
@@ -19,11 +24,18 @@ const mobilenetDemo = async () => {
 
     mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
 
+    const layer = mobilenet.getLayer('conv_pw_13_relu');
+    mobilenet = await tf.model({inputs: mobilenet.inputs, outputs: layer.output});
+
+    await train();
+
+    //const layerOutput = layer.output.shape;
+    //layerOutput.print();
+
     //1 billede af 224x224 pixels i RGB (3 channels),
     mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, COLOR])).dispose();
 
     status('');
-
 
     const catElement = document.getElementById('cat');
     if (catElement.complete && catElement.naturalHeight !== 0) {
@@ -36,12 +48,81 @@ const mobilenetDemo = async () => {
       }
     }
 
+    /*tf.tidy(() => {
+      const img = webcam.capture();
+      controllerDataset.addExample(mobilenet.predict(img), label);
+  
+    });*/
+
     document.getElementById('file-container').style.display = '';
 
   });
-
-
 };
+
+
+/**
+ * Sets up and trains the classifier.
+ */
+async function train() {
+  if (controllerDataset.xs == null) {
+    throw new Error('Add some examples before training!');
+  }
+
+  // Creates a 2-layer fully connected model. By creating a separate model,
+  // rather than adding layers to the mobilenet model, we "freeze" the weights
+  // of the mobilenet model, and only train weights from the new model.
+  mobilenet = tf.sequential({
+    layers: [
+      // Flattens the input to a vector so we can use it in a dense layer. While
+      // technically a layer, this only performs a reshape (and has no training
+      // parameters).
+      tf.layers.flatten({inputShape: [7, 7, 256]}),
+      // Layer 1
+      tf.layers.dense({
+        units: 100,
+        activation: 'relu',
+        kernelInitializer: 'varianceScaling',
+        useBias: true
+      }),
+      // Layer 2. The number of units of the last layer should correspond
+      // to the number of classes we want to predict.
+      tf.layers.dense({
+        units: NUM_CLASSES,
+        kernelInitializer: 'varianceScaling',
+        useBias: false,
+        activation: 'softmax'
+      })
+    ]
+  });
+
+  // Creates the optimizers which drives training of the model.
+  const optimizer = tf.train.adam(0.0001);
+  // We use categoricalCrossentropy which is the loss function we use for
+  // categorical classification which measures the error between our predicted
+  // probability distribution over classes (probability that an input is of each
+  // class), versus the label (100% probability in the true class)>
+  mobilenet.compile({optimizer: optimizer, loss: 'categoricalCrossentropy'});
+
+  // We parameterize batch size as a fraction of the entire dataset because the
+  // number of examples that are collected depends on how many examples the user
+  // collects. This allows us to have a flexible batch size.
+  const batchSize = Math.floor(controllerDataset.xs.shape[0] * 0.4);
+  if (!(batchSize > 0)) {
+    throw new Error(
+        `Batch size is 0 or NaN. Please choose a non-zero fraction.`);
+  }
+
+  // Train the model! Model.fit() will shuffle xs & ys so we don't have to.
+  mobilenet.fit(controllerDataset.xs, controllerDataset.ys, {
+    batchSize,
+    epochs: 20,
+    callbacks: {
+      onBatchEnd: async (batch, logs) => {
+        console.log('Loss: ' + logs.loss.toFixed(5));
+      }
+    }
+  });
+}
 
 
 
@@ -57,19 +138,19 @@ async function predict(imgElement) {
     // tf.fromPixels() returns a Tensor from an image element.
     const img = tf.fromPixels(imgElement).toFloat();
 
-    img.print();
+    //img.print();
 
     const offset = tf.scalar(127.5);
     // Normalize the image from [0, 255] to [-1, 1].
     const normalized = img.sub(offset).div(offset);
 
-    normalized.print();
+    //normalized.print();
 
     // Reshape to a single-element batch so we can pass it to predict.
     //1 billede af 224x224 pixels i RGB (3 channels),
     const batched = normalized.reshape([1, IMAGE_SIZE, IMAGE_SIZE, COLOR]);
 
-    batched.print();
+    //batched.print();
 
     // Make a prediction through mobilenet.
     return mobilenet.predict(batched);
