@@ -24,6 +24,8 @@ const controllerDataset = new ControllerDataset(NUM_CLASSES);
 const label = "erol";
 
 let mobilenet;
+let model;
+
 const mobilenetDemo = async () => {
   status('Loading model...');
 
@@ -52,7 +54,7 @@ const mobilenetDemo = async () => {
 
     status('');
 
-    /*const catElement = document.getElementById('cat');
+    const catElement = document.getElementById('cat');
     if (catElement.complete && catElement.naturalHeight !== 0) {
       predict2(catElement);
       catElement.style.display = '';
@@ -61,7 +63,7 @@ const mobilenetDemo = async () => {
         predict2(catElement);
         catElement.style.display = '';
       }
-    }*/
+    }
 
     document.getElementById('file-container').style.display = '';
 
@@ -108,12 +110,13 @@ async function train() {
   // Creates a 2-layer fully connected model. By creating a separate model,
   // rather than adding layers to the mobilenet model, we "freeze" the weights
   // of the mobilenet model, and only train weights from the new model.
-  mobilenet = tf.sequential({
+  model = tf.sequential({
     layers: [
       // Flattens the input to a vector so we can use it in a dense layer. While
       // technically a layer, this only performs a reshape (and has no training
       // parameters).
       tf.layers.flatten({inputShape: [7, 7, 256]}),
+      //tf.layers.flatten({inputShape: [224,224,3]}),
       // Layer 1
       tf.layers.dense({
         units: 100,
@@ -138,7 +141,7 @@ async function train() {
   // categorical classification which measures the error between our predicted
   // probability distribution over classes (probability that an input is of each
   // class), versus the label (100% probability in the true class)>
-  mobilenet.compile({optimizer: optimizer, loss: 'categoricalCrossentropy'});
+  model.compile({optimizer: optimizer, loss: 'categoricalCrossentropy'});
 
   // We parameterize batch size as a fraction of the entire dataset because the
   // number of examples that are collected depends on how many examples the user
@@ -151,7 +154,7 @@ async function train() {
   let batchSize = 10;
 
   // Train the model! Model.fit() will shuffle xs & ys so we don't have to.
-  mobilenet.fit(controllerDataset.xs, controllerDataset.ys, {
+  model.fit(controllerDataset.xs, controllerDataset.ys, {
     batchSize,
     epochs: 20,
     callbacks: {
