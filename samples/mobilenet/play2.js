@@ -3,6 +3,7 @@ import * as tf from '@tensorflow/tfjs';
 import {IMAGENET_CLASSES} from './imagenet_classes';
 import {ControllerDataset} from './controller_dataset';
 import {Webcam} from './webcam';
+//import * as ui from './ui';
 
 
 const webcam = new Webcam(document.getElementById('webcam'));
@@ -21,7 +22,7 @@ const NUM_CLASSES = 2;
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
 
-const label = "erol";
+const label = "10000";
 
 let mobilenet;
 let model;
@@ -38,13 +39,32 @@ const mobilenetDemo = async () => {
 
     await init();
 
-   await tf.tidy(() => {
-      const img = webcam.capture();
-      controllerDataset.addExample(mobilenet.predict(img), label);
+    
+    let button = document.createElement('button');
+    button.innerHTML = 'Tilføj billeder';
+    button.onclick = function(){
+      tf.tidy(() => {
+        for(let i = 0; i < 10; i ++){
+            setTimeout( function timer(){
+             // alert("hello world");
+             const img = webcam.capture();
+             controllerDataset.addExample(mobilenet.predict(img), label);
+   
+             // Draw the preview thumbnail.
+             drawThumb(img, label);
   
-    });
+          }, i*500 );
+        }
+      });
+    }
+    document.getElementById('addImages').appendChild(button);
 
-    await train();
+    let button2 = document.createElement('button');
+    button2.innerHTML = 'Træn neural netværk';
+    button2.onclick = function(){
+       train();
+    }
+    document.getElementById('train').appendChild(button2);
 
     //const layerOutput = layer.output.shape;
     //layerOutput.print();
@@ -54,7 +74,7 @@ const mobilenetDemo = async () => {
 
     status('');
 
-    const catElement = document.getElementById('cat');
+    /*const catElement = document.getElementById('cat');
     if (catElement.complete && catElement.naturalHeight !== 0) {
       predict2(catElement);
       catElement.style.display = '';
@@ -63,13 +83,38 @@ const mobilenetDemo = async () => {
         predict2(catElement);
         catElement.style.display = '';
       }
-    }
+    }*/
 
     document.getElementById('file-container').style.display = '';
 
   });
 };
 
+
+function drawThumb(img, label) {
+  /*if (thumbDisplayed[label] == null) {
+    const thumbCanvas = document.getElementById(CONTROLS[label] + '-thumb');
+    draw(img, thumbCanvas);
+  }*/
+
+  const thumbCanvas = document.getElementById('my-thumb');
+  draw(img, thumbCanvas);
+}
+
+function draw(image, canvas) {
+  const [width, height] = [224, 224];
+  const ctx = canvas.getContext('2d');
+  const imageData = new ImageData(width, height);
+  const data = image.dataSync();
+  for (let i = 0; i < height * width; ++i) {
+    const j = i * 4;
+    imageData.data[j + 0] = (data[i * 3 + 0] + 1) * 127;
+    imageData.data[j + 1] = (data[i * 3 + 1] + 1) * 127;
+    imageData.data[j + 2] = (data[i * 3 + 2] + 1) * 127;
+    imageData.data[j + 3] = 255;
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
 
 
 async function init() {
@@ -151,7 +196,7 @@ async function train() {
     throw new Error(
         `Batch size is 0 or NaN. Please choose a non-zero fraction.`);
   }*/
-  let batchSize = 10;
+  let batchSize = 1;
 
   // Train the model! Model.fit() will shuffle xs & ys so we don't have to.
   model.fit(controllerDataset.xs, controllerDataset.ys, {
@@ -216,11 +261,14 @@ async function predict2(img) {
     // Make a prediction through our newly-trained model using the activation
     // from mobilenet as input.
     const predictions = model.predict(activation);
+    predictions.print();
 
     // Returns the index with the maximum probability. This number corresponds
     // to the class the model thinks is the most probable given the input.
     return predictions.as1D().argMax();
   });
+  //console.log("predictedClass: "+predictedClass);
+  predictedClass.print();
 }
 
 
