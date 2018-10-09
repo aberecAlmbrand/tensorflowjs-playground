@@ -22,10 +22,25 @@ const NUM_CLASSES = 2;
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
 
-const label = "10000";
-
 let mobilenet;
 let model;
+
+
+function traning(label){
+  tf.tidy(() => {
+    for(let i = 0; i < 10; i ++){
+        setTimeout( function timer(){
+         // alert("hello world");
+         const img = webcam.capture();
+         controllerDataset.addExample(mobilenet.predict(img), label);
+
+         // Draw the preview thumbnail.
+         drawThumb(img, label);
+
+      }, i*200 );
+    }
+  });
+}
 
 const mobilenetDemo = async () => {
   status('Loading model...');
@@ -41,23 +56,18 @@ const mobilenetDemo = async () => {
 
     
     let button = document.createElement('button');
-    button.innerHTML = 'Tilføj billeder';
+    button.innerHTML = 'Tilføj billeder 0';
     button.onclick = function(){
-      tf.tidy(() => {
-        for(let i = 0; i < 10; i ++){
-            setTimeout( function timer(){
-             // alert("hello world");
-             const img = webcam.capture();
-             controllerDataset.addExample(mobilenet.predict(img), label);
-   
-             // Draw the preview thumbnail.
-             drawThumb(img, label);
-  
-          }, i*500 );
-        }
-      });
+      traning(0);
     }
     document.getElementById('addImages').appendChild(button);
+
+    button = document.createElement('button');
+    button.innerHTML = 'Tilføj billeder 1';
+    button.onclick = function(){
+      traning(1);
+    }
+    document.getElementById('addImages2').appendChild(button);
 
     let button2 = document.createElement('button');
     button2.innerHTML = 'Træn neural netværk';
@@ -198,6 +208,9 @@ async function train() {
   }*/
   let batchSize = 1;
 
+  //controllerDataset.xs.print();
+  //controllerDataset.ys.print();
+
   // Train the model! Model.fit() will shuffle xs & ys so we don't have to.
   model.fit(controllerDataset.xs, controllerDataset.ys, {
     batchSize,
@@ -257,11 +270,12 @@ async function predict2(img) {
     // Make a prediction through mobilenet, getting the internal activation of
     // the mobilenet model.
     const activation = mobilenet.predict(_img);
+    //activation.print();
 
     // Make a prediction through our newly-trained model using the activation
     // from mobilenet as input.
     const predictions = model.predict(activation);
-    predictions.print();
+    //predictions.print();
 
     // Returns the index with the maximum probability. This number corresponds
     // to the class the model thinks is the most probable given the input.
@@ -280,7 +294,7 @@ async function predict2(img) {
  * @param logits Tensor representing the logits from MobileNet.
  * @param topK The number of top predictions to show.
  */
-export async function getTopKClasses(logits, topK) {
+/*export async function getTopKClasses(logits, topK) {
   const values = await logits.data();
 
   const valuesAndIndices = [];
@@ -305,13 +319,13 @@ export async function getTopKClasses(logits, topK) {
     })
   }
   return topClassesAndProbs;
-}
+}*/
 
 //
 // UI
 //
 
-function showResults(imgElement, classes) {
+/*function showResults(imgElement, classes) {
   const predictionContainer = document.createElement('div');
   predictionContainer.className = 'pred-container';
 
@@ -340,7 +354,7 @@ function showResults(imgElement, classes) {
 
   predictionsElement.insertBefore(
       predictionContainer, predictionsElement.firstChild);
-}
+}*/
 
 const filesElement = document.getElementById('files');
 filesElement.addEventListener('change', evt => {
