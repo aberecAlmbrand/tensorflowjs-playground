@@ -2,11 +2,16 @@ import * as tf from '@tensorflow/tfjs';
 
 import {IMAGENET_CLASSES} from './imagenet_classes';
 import {ControllerDataset} from './controller_dataset';
+import {Webcam} from './webcam';
+
+
+const webcam = new Webcam(document.getElementById('webcam'));
 
 const MOBILENET_MODEL_PATH =
     // tslint:disable-next-line:max-line-length
-    'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
+    //'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
     //'http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/model2/model.json';
+    'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
 
 const IMAGE_SIZE = 224;
 const TOPK_PREDICTIONS = 10;
@@ -16,16 +21,26 @@ const NUM_CLASSES = 2;
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
 
+const label = "erol";
+
 let mobilenet;
 const mobilenetDemo = async () => {
   status('Loading model...');
 
   document.addEventListener("DOMContentLoaded", async function(){
 
-    mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
+    //mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
 
-    const layer = mobilenet.getLayer('conv_pw_13_relu');
-    mobilenet = await tf.model({inputs: mobilenet.inputs, outputs: layer.output});
+    //const layer = mobilenet.getLayer('conv_pw_13_relu');
+    //mobilenet = await tf.model({inputs: mobilenet.inputs, outputs: layer.output});
+
+    await init();
+
+   await tf.tidy(() => {
+      const img = webcam.capture();
+      controllerDataset.addExample(mobilenet.predict(img), label);
+  
+    });
 
     await train();
 
@@ -33,31 +48,53 @@ const mobilenetDemo = async () => {
     //layerOutput.print();
 
     //1 billede af 224x224 pixels i RGB (3 channels),
-    mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, COLOR])).dispose();
+    //mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, COLOR])).dispose();
 
     status('');
 
-    const catElement = document.getElementById('cat');
+    /*const catElement = document.getElementById('cat');
     if (catElement.complete && catElement.naturalHeight !== 0) {
-      predict(catElement);
+      predict2(catElement);
       catElement.style.display = '';
     } else {
       catElement.onload = () => {
-        predict(catElement);
+        predict2(catElement);
         catElement.style.display = '';
       }
-    }
-
-    /*tf.tidy(() => {
-      const img = webcam.capture();
-      controllerDataset.addExample(mobilenet.predict(img), label);
-  
-    });*/
+    }*/
 
     document.getElementById('file-container').style.display = '';
 
   });
 };
+
+
+
+async function init() {
+  try {
+    await webcam.setup();
+  } catch (e) {
+    document.getElementById('no-webcam').style.display = 'block';
+  }
+  
+  mobilenet = await loadMobilenet();
+
+  // Warm up the model. This uploads weights to the GPU and compiles the WebGL
+  // programs so the first time we collect data from the webcam it will be
+  // quick.
+  tf.tidy(() => mobilenet.predict(webcam.capture()));
+
+}
+
+// Loads mobilenet and returns a model that returns the internal activation
+// we'll use as input to our classifier model.
+async function loadMobilenet() {
+  const mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
+
+  // Return a model that outputs an internal activation.
+  const layer = mobilenet.getLayer('conv_pw_13_relu');
+  return tf.model({inputs: mobilenet.inputs, outputs: layer.output});
+}
 
 
 /**
@@ -106,11 +143,12 @@ async function train() {
   // We parameterize batch size as a fraction of the entire dataset because the
   // number of examples that are collected depends on how many examples the user
   // collects. This allows us to have a flexible batch size.
-  const batchSize = Math.floor(controllerDataset.xs.shape[0] * 0.4);
+  /*const batchSize = Math.floor(controllerDataset.xs.shape[0] * 0.4);
   if (!(batchSize > 0)) {
     throw new Error(
         `Batch size is 0 or NaN. Please choose a non-zero fraction.`);
-  }
+  }*/
+  let batchSize = 10;
 
   // Train the model! Model.fit() will shuffle xs & ys so we don't have to.
   mobilenet.fit(controllerDataset.xs, controllerDataset.ys, {
@@ -123,8 +161,6 @@ async function train() {
     }
   });
 }
-
-
 
 /**
  * Given an image element, makes a prediction through mobilenet returning the
@@ -164,6 +200,28 @@ async function predict(imgElement) {
   // Show the classes in the DOM.
   showResults(imgElement, classes);
 }
+
+async function predict2(img) {
+  const predictedClass = tf.tidy(() => {
+    // Capture the frame from the webcam.
+    const _img = webcam.uploadImage(img);
+
+    // Make a prediction through mobilenet, getting the internal activation of
+    // the mobilenet model.
+    const activation = mobilenet.predict(_img);
+
+    // Make a prediction through our newly-trained model using the activation
+    // from mobilenet as input.
+    const predictions = model.predict(activation);
+
+    // Returns the index with the maximum probability. This number corresponds
+    // to the class the model thinks is the most probable given the input.
+    return predictions.as1D().argMax();
+  });
+}
+
+
+
 
 /**
  * Computes the probabilities of the topK classes given logits by computing
@@ -251,7 +309,7 @@ filesElement.addEventListener('change', evt => {
       img.src = e.target.result;
       img.width = IMAGE_SIZE;
       img.height = IMAGE_SIZE;
-      img.onload = () => predict(img);
+      img.onload = () => predict2(img);
     };
 
     // Read in the image file as a data URL.
