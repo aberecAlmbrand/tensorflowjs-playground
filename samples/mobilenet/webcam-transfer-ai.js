@@ -3,7 +3,6 @@ import * as tf from '@tensorflow/tfjs';
 import {IMAGENET_CLASSES} from './imagenet_classes';
 import {ControllerDataset} from './controller_dataset';
 import {Webcam} from './webcam';
-//import * as ui from './ui';
 
 
 const webcam = new Webcam(document.getElementById('webcam'));
