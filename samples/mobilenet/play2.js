@@ -17,7 +17,7 @@ const MOBILENET_MODEL_PATH =
 const IMAGE_SIZE = 224;
 const TOPK_PREDICTIONS = 10;
 const COLOR = 3;
-const NUM_CLASSES = 2;
+const NUM_CLASSES = 3;
 
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
@@ -26,10 +26,11 @@ let mobilenet;
 let model;
 
 
-function traning(label){
-  tf.tidy(() => {
-    for(let i = 0; i < 10; i ++){
-        setTimeout( function timer(){
+async function traning(label){
+  await tf.tidy(() => {
+    console.log("started => "+label);
+    for(let i = 0; i < 100; i ++){
+        //setTimeout( function timer(){
          // alert("hello world");
          const img = webcam.capture();
          controllerDataset.addExample(mobilenet.predict(img), label);
@@ -37,9 +38,11 @@ function traning(label){
          // Draw the preview thumbnail.
          drawThumb(img, label);
 
-      }, i*200 );
+      //}, i*200 );
     }
   });
+
+  console.log("done => "+label);
 }
 
 const mobilenetDemo = async () => {
@@ -68,6 +71,15 @@ const mobilenetDemo = async () => {
       traning(1);
     }
     document.getElementById('addImages2').appendChild(button);
+
+    button = document.createElement('button');
+    button.innerHTML = 'Tilføj billeder 2';
+    button.onclick = function(){
+      traning(2);
+    }
+    document.getElementById('addImages3').appendChild(button);
+
+
 
     let button2 = document.createElement('button');
     button2.innerHTML = 'Træn neural netværk';
@@ -201,12 +213,12 @@ async function train() {
   // We parameterize batch size as a fraction of the entire dataset because the
   // number of examples that are collected depends on how many examples the user
   // collects. This allows us to have a flexible batch size.
-  /*const batchSize = Math.floor(controllerDataset.xs.shape[0] * 0.4);
+  const batchSize = Math.floor(controllerDataset.xs.shape[0] * 0.4);
   if (!(batchSize > 0)) {
     throw new Error(
         `Batch size is 0 or NaN. Please choose a non-zero fraction.`);
-  }*/
-  let batchSize = 1;
+  }
+  //let batchSize = 2;
 
   //controllerDataset.xs.print();
   //controllerDataset.ys.print();
@@ -223,46 +235,7 @@ async function train() {
   });
 }
 
-/**
- * Given an image element, makes a prediction through mobilenet returning the
- * probabilities of the top K classes.
- */
-async function predict(imgElement) {
-  status('Predicting...');
-
-  const startTime = performance.now();
-  const logits = tf.tidy(() => {
-    // tf.fromPixels() returns a Tensor from an image element.
-    const img = tf.fromPixels(imgElement).toFloat();
-
-    //img.print();
-
-    const offset = tf.scalar(127.5);
-    // Normalize the image from [0, 255] to [-1, 1].
-    const normalized = img.sub(offset).div(offset);
-
-    //normalized.print();
-
-    // Reshape to a single-element batch so we can pass it to predict.
-    //1 billede af 224x224 pixels i RGB (3 channels),
-    const batched = normalized.reshape([1, IMAGE_SIZE, IMAGE_SIZE, COLOR]);
-
-    //batched.print();
-
-    // Make a prediction through mobilenet.
-    return mobilenet.predict(batched);
-  });
-
-  // Convert logits to probabilities and class names.
-  const classes = await getTopKClasses(logits, TOPK_PREDICTIONS);
-  const totalTime = performance.now() - startTime;
-  status(`Done in ${Math.floor(totalTime)}ms`);
-
-  // Show the classes in the DOM.
-  showResults(imgElement, classes);
-}
-
-async function predict2(img) {
+async function predict(img) {
   const predictedClass = tf.tidy(() => {
     // Capture the frame from the webcam.
     const _img = webcam.uploadImage(img);
@@ -285,77 +258,6 @@ async function predict2(img) {
   predictedClass.print();
 }
 
-
-
-
-/**
- * Computes the probabilities of the topK classes given logits by computing
- * softmax to get probabilities and then sorting the probabilities.
- * @param logits Tensor representing the logits from MobileNet.
- * @param topK The number of top predictions to show.
- */
-/*export async function getTopKClasses(logits, topK) {
-  const values = await logits.data();
-
-  const valuesAndIndices = [];
-  for (let i = 0; i < values.length; i++) {
-    valuesAndIndices.push({value: values[i], index: i});
-  }
-  valuesAndIndices.sort((a, b) => {
-    return b.value - a.value;
-  });
-  const topkValues = new Float32Array(topK);
-  const topkIndices = new Int32Array(topK);
-  for (let i = 0; i < topK; i++) {
-    topkValues[i] = valuesAndIndices[i].value;
-    topkIndices[i] = valuesAndIndices[i].index;
-  }
-
-  const topClassesAndProbs = [];
-  for (let i = 0; i < topkIndices.length; i++) {
-    topClassesAndProbs.push({
-      className: IMAGENET_CLASSES[topkIndices[i]],
-      probability: topkValues[i]
-    })
-  }
-  return topClassesAndProbs;
-}*/
-
-//
-// UI
-//
-
-/*function showResults(imgElement, classes) {
-  const predictionContainer = document.createElement('div');
-  predictionContainer.className = 'pred-container';
-
-  const imgContainer = document.createElement('div');
-  imgContainer.appendChild(imgElement);
-  predictionContainer.appendChild(imgContainer);
-
-  const probsContainer = document.createElement('div');
-  for (let i = 0; i < classes.length; i++) {
-    const row = document.createElement('div');
-    row.className = 'row';
-
-    const classElement = document.createElement('div');
-    classElement.className = 'cell';
-    classElement.innerText = classes[i].className;
-    row.appendChild(classElement);
-
-    const probsElement = document.createElement('div');
-    probsElement.className = 'cell';
-    probsElement.innerText = classes[i].probability.toFixed(3);
-    row.appendChild(probsElement);
-
-    probsContainer.appendChild(row);
-  }
-  predictionContainer.appendChild(probsContainer);
-
-  predictionsElement.insertBefore(
-      predictionContainer, predictionsElement.firstChild);
-}*/
-
 const filesElement = document.getElementById('files');
 filesElement.addEventListener('change', evt => {
   let files = evt.target.files;
@@ -374,7 +276,7 @@ filesElement.addEventListener('change', evt => {
       img.src = e.target.result;
       img.width = IMAGE_SIZE;
       img.height = IMAGE_SIZE;
-      img.onload = () => predict2(img);
+      img.onload = () => predict(img);
     };
 
     // Read in the image file as a data URL.
