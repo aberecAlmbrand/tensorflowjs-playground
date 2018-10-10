@@ -8,9 +8,6 @@ import {Webcam} from './webcam';
 const webcam = new Webcam(document.getElementById('webcam'));
 
 const MOBILENET_MODEL_PATH =
-    // tslint:disable-next-line:max-line-length
-    //'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
-    //'http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/model2/model.json';
     'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
 
 const IMAGE_SIZE = 224;
@@ -26,6 +23,7 @@ let model;
 async function traning(label){
   await tf.tidy(() => {
     console.log("started => "+label);
+    status("started => "+label);
     for(let i = 0; i < 100; i ++){
         //setTimeout( function timer(){
          const img = webcam.capture();
@@ -39,6 +37,7 @@ async function traning(label){
   });
 
   console.log("done => "+label);
+  status("done => "+label);
 }
 
 const mobilenetDemo = async () => {
@@ -121,7 +120,6 @@ async function init() {
   // programs so the first time we collect data from the webcam it will be
   // quick.
   tf.tidy(() => mobilenet.predict(webcam.capture()));
-
 }
 
 // Loads mobilenet and returns a model that returns the internal activation
@@ -195,6 +193,7 @@ async function train() {
     callbacks: {
       onBatchEnd: async (batch, logs) => {
         console.log('Loss: ' + logs.loss.toFixed(5));
+        status('Loss: ' + logs.loss.toFixed(5));
       }
     }
   });
