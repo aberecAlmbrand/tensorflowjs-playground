@@ -18,6 +18,8 @@ const TOPK_PREDICTIONS = 10;
 const COLOR = 3;
 const NUM_CLASSES = 3;
 
+const labels = ["billede 0 er fundet", "billede 1 er fundet", "billede 2 er fundet"];
+
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
 
@@ -118,7 +120,7 @@ function drawThumb(img, label) {
     draw(img, thumbCanvas);
   }*/
 
-  const thumbCanvas = document.getElementById('my-thumb');
+  const thumbCanvas = document.getElementById('my-thumb-'+label);
   draw(img, thumbCanvas);
 }
 
@@ -255,6 +257,9 @@ async function predict(img) {
   });
   //console.log("predictedClass: "+predictedClass);
   predictedClass.print();
+
+ document.getElementById('result').innerHTML = "Billede: "+await predictedClass.data() +" fundet";
+
 }
 
 const filesElement = document.getElementById('files');
