@@ -14,11 +14,7 @@ const MOBILENET_MODEL_PATH =
     'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
 
 const IMAGE_SIZE = 224;
-const TOPK_PREDICTIONS = 10;
-const COLOR = 3;
 const NUM_CLASSES = 3;
-
-const labels = ["billede 0 er fundet", "billede 1 er fundet", "billede 2 er fundet"];
 
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
@@ -32,7 +28,6 @@ async function traning(label){
     console.log("started => "+label);
     for(let i = 0; i < 100; i ++){
         //setTimeout( function timer(){
-         // alert("hello world");
          const img = webcam.capture();
          controllerDataset.addExample(mobilenet.predict(img), label);
 
@@ -51,13 +46,7 @@ const mobilenetDemo = async () => {
 
   document.addEventListener("DOMContentLoaded", async function(){
 
-    //mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
-
-    //const layer = mobilenet.getLayer('conv_pw_13_relu');
-    //mobilenet = await tf.model({inputs: mobilenet.inputs, outputs: layer.output});
-
     await init();
-
     
     let button = document.createElement('button');
     button.innerHTML = 'Tilføj billeder 0';
@@ -80,33 +69,12 @@ const mobilenetDemo = async () => {
     }
     document.getElementById('addImages3').appendChild(button);
 
-
-
     let button2 = document.createElement('button');
     button2.innerHTML = 'Træn neural netværk';
     button2.onclick = function(){
        train();
     }
     document.getElementById('train').appendChild(button2);
-
-    //const layerOutput = layer.output.shape;
-    //layerOutput.print();
-
-    //1 billede af 224x224 pixels i RGB (3 channels),
-    //mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, COLOR])).dispose();
-
-    status('');
-
-    /*const catElement = document.getElementById('cat');
-    if (catElement.complete && catElement.naturalHeight !== 0) {
-      predict2(catElement);
-      catElement.style.display = '';
-    } else {
-      catElement.onload = () => {
-        predict2(catElement);
-        catElement.style.display = '';
-      }
-    }*/
 
     document.getElementById('file-container').style.display = '';
 
@@ -125,7 +93,7 @@ function drawThumb(img, label) {
 }
 
 function draw(image, canvas) {
-  const [width, height] = [224, 224];
+  const [width, height] = [IMAGE_SIZE, IMAGE_SIZE];
   const ctx = canvas.getContext('2d');
   const imageData = new ImageData(width, height);
   const data = image.dataSync();
@@ -219,10 +187,6 @@ async function train() {
     throw new Error(
         `Batch size is 0 or NaN. Please choose a non-zero fraction.`);
   }
-  //let batchSize = 2;
-
-  //controllerDataset.xs.print();
-  //controllerDataset.ys.print();
 
   // Train the model! Model.fit() will shuffle xs & ys so we don't have to.
   model.fit(controllerDataset.xs, controllerDataset.ys, {
@@ -249,7 +213,6 @@ async function predict(img) {
     // Make a prediction through our newly-trained model using the activation
     // from mobilenet as input.
     const predictions = model.predict(activation);
-    //predictions.print();
 
     // Returns the index with the maximum probability. This number corresponds
     // to the class the model thinks is the most probable given the input.
