@@ -36,15 +36,64 @@ async function traning(label){
   status("done => "+label);
 }
 
+/*async function downloadFiles(){
+    var xhrList = [];
+    var urlList = ['http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/cat.jpg'];
+    for (var i=0; i< urlList.length; i++){
+        xhrList[i] = new XMLHttpRequest();
+
+        xhrList[i].open('GET', urlList[i], true);
+
+        xhrList[i].responseType = "blob";
+        console.log(xhrList[i]);
+
+        xhrList[i].onload = async function(e) {
+            console.log(e);
+            if (this.readyState == 4) {
+                console.log("resp: "+this.response);
+
+                var urlCreator = window.URL || window.webkitURL;
+                var imageUrl = urlCreator.createObjectURL(this.response);
+
+                const image = await loadImage(imageUrl);
+                const img = webcam.uploadImage(image);
+                controllerDataset.addExample(mobilenet.predict(img), "0");
+                drawThumb(img, "0");
+            }
+        };
+        xhrList[i].send();
+    }
+}*/
+
+async function loadImage(imageUrl) {
+  const img = new Image();
+  const promise = new Promise((resolve, reject) => {
+    img.crossOrigin = '';
+    img.width = IMAGE_SIZE;
+    img.height = IMAGE_SIZE;
+    img.onload = () => {
+      resolve(img);
+    };
+  });
+
+  img.src = imageUrl;
+  return promise;
+}
+
+
+
 const mobilenetDemo = async () => {
   status('Loading model...');
 
   document.addEventListener("DOMContentLoaded", async function(){
 
-    let catsData = await p5.prototype.loadBytes('cat.jpg');
+    await init();
 
-    //await init();
-    
+    let image = await loadImage("http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/cat.jpg");
+    const img = webcam.uploadImage(image);
+    controllerDataset.addExample(mobilenet.predict(img), "0");
+    drawThumb(img, "0");
+
     let button = document.createElement('button');
     button.innerHTML = 'Tilføj billeder 0';
     button.onclick = function(){
