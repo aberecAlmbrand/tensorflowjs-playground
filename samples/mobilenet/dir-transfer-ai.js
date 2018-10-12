@@ -10,6 +10,8 @@ const webcam = new Webcam(document.getElementById('webcam'));
 const MOBILENET_MODEL_PATH =
     'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
 
+const IMAGES_PATH = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/koerekort/";    
+
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
 
@@ -89,10 +91,12 @@ const mobilenetDemo = async () => {
 
     await init();
 
-    let image = await loadImage("http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/cat.jpg");
-    const img = webcam.uploadImage(image);
-    controllerDataset.addExample(mobilenet.predict(img), "0");
-    drawThumb(img, "0");
+    for(let i=1; i<28; i++){
+      let image = await loadImage(IMAGES_PATH+"images ("+i+").jpg");
+      const img = webcam.uploadImage(image);
+      controllerDataset.addExample(mobilenet.predict(img), "0");
+      drawThumb(img, "0");
+    }
 
     let button = document.createElement('button');
     button.innerHTML = 'Tilføj billeder 0';
