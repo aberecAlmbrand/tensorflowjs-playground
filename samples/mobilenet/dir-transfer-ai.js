@@ -11,6 +11,8 @@ const MOBILENET_MODEL_PATH =
     'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
 
 const IMAGES_PATH = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/koerekort/";    
+const IMAGES_PATH2 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/cars/";   
+const IMAGES_PATH3 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/house/";   
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
@@ -91,13 +93,28 @@ const mobilenetDemo = async () => {
 
     await init();
 
-    for(let i=1; i<28; i++){
+    for(let i=1; i<36; i++){
       let image = await loadImage(IMAGES_PATH+"images ("+i+").jpg");
       const img = webcam.uploadImage(image);
       controllerDataset.addExample(mobilenet.predict(img), "0");
       drawThumb(img, "0");
     }
 
+    for(let i=1; i<9; i++){
+      let image = await loadImage(IMAGES_PATH2+"cars ("+i+").jpg");
+      const img = webcam.uploadImage(image);
+      controllerDataset.addExample(mobilenet.predict(img), "1");
+      drawThumb(img, "1");
+    }
+
+    for(let i=1; i<11; i++){
+      let image = await loadImage(IMAGES_PATH3+"house ("+i+").jpg");
+      const img = webcam.uploadImage(image);
+      controllerDataset.addExample(mobilenet.predict(img), "2");
+      drawThumb(img, "2");
+    }
+
+    /*
     let button = document.createElement('button');
     button.innerHTML = 'Tilføj billeder 0';
     button.onclick = function(){
@@ -117,7 +134,7 @@ const mobilenetDemo = async () => {
     button.onclick = function(){
       traning(2);
     }
-    document.getElementById('addImages3').appendChild(button);
+    document.getElementById('addImages3').appendChild(button);*/
 
     let button2 = document.createElement('button');
     button2.innerHTML = 'Træn neural netværk';
@@ -159,11 +176,11 @@ function draw(image, canvas) {
 
 
 async function init() {
-  try {
+  /*try {
     await webcam.setup();
   } catch (e) {
     document.getElementById('no-webcam').style.display = 'block';
-  }
+  }*/
   
   mobilenet = await loadMobilenet();
 
