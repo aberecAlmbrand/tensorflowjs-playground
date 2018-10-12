@@ -1,6 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
 
-import {IMAGENET_CLASSES} from './imagenet_classes';
 import {ControllerDataset} from './controller_dataset';
 import {Webcam} from './webcam';
 
@@ -13,6 +12,8 @@ const MOBILENET_MODEL_PATH =
 const IMAGES_PATH = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/koerekort/";    
 const IMAGES_PATH2 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/cars/";   
 const IMAGES_PATH3 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/house/";   
+
+const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
@@ -40,34 +41,6 @@ async function traning(label){
   status("done => "+label);
 }
 
-/*async function downloadFiles(){
-    var xhrList = [];
-    var urlList = ['http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/cat.jpg'];
-    for (var i=0; i< urlList.length; i++){
-        xhrList[i] = new XMLHttpRequest();
-
-        xhrList[i].open('GET', urlList[i], true);
-
-        xhrList[i].responseType = "blob";
-        console.log(xhrList[i]);
-
-        xhrList[i].onload = async function(e) {
-            console.log(e);
-            if (this.readyState == 4) {
-                console.log("resp: "+this.response);
-
-                var urlCreator = window.URL || window.webkitURL;
-                var imageUrl = urlCreator.createObjectURL(this.response);
-
-                const image = await loadImage(imageUrl);
-                const img = webcam.uploadImage(image);
-                controllerDataset.addExample(mobilenet.predict(img), "0");
-                drawThumb(img, "0");
-            }
-        };
-        xhrList[i].send();
-    }
-}*/
 
 async function loadImage(imageUrl) {
   const img = new Image();
@@ -83,8 +56,6 @@ async function loadImage(imageUrl) {
   img.src = imageUrl;
   return promise;
 }
-
-
 
 const mobilenetDemo = async () => {
   status('Loading model...');
@@ -114,6 +85,15 @@ const mobilenetDemo = async () => {
       drawThumb(img, "2");
     }
 
+    //træn netværk
+    await train();
+
+    //gem model
+    saveModel().then((result) =>{
+        const saveResult = result;
+        console.log(saveResult);
+    });
+
     /*
     let button = document.createElement('button');
     button.innerHTML = 'Tilføj billeder 0';
@@ -134,19 +114,23 @@ const mobilenetDemo = async () => {
     button.onclick = function(){
       traning(2);
     }
-    document.getElementById('addImages3').appendChild(button);*/
+    document.getElementById('addImages3').appendChild(button);
 
     let button2 = document.createElement('button');
     button2.innerHTML = 'Træn neural netværk';
     button2.onclick = function(){
        train();
     }
-    document.getElementById('train').appendChild(button2);
+    document.getElementById('train').appendChild(button2);**/
 
     document.getElementById('file-container').style.display = '';
 
   });
 };
+
+async function saveModel() {
+  return await model.save(MODEL_SAVE_PATH_);
+}
 
 
 function drawThumb(img, label) {
@@ -261,7 +245,7 @@ async function train() {
     callbacks: {
       onBatchEnd: async (batch, logs) => {
         console.log('Loss: ' + logs.loss.toFixed(5));
-        status('Loss: ' + logs.loss.toFixed(5));
+        status('Træner netværk => Loss: ' + logs.loss.toFixed(5));
       }
     }
   });
@@ -269,6 +253,8 @@ async function train() {
 
 async function predict(img) {
   const predictedClass = tf.tidy(() => {
+    document.getElementById('error').innerHTML = "";
+
     // Capture the frame from the webcam.
     const _img = webcam.uploadImage(img);
 
@@ -283,13 +269,20 @@ async function predict(img) {
 
     // Returns the index with the maximum probability. This number corresponds
     // to the class the model thinks is the most probable given the input.
-    return predictions.as1D().argMax();
+    
+    //return predictions.as1D().argMax();
+    return predictions.as1D();
   });
   //console.log("predictedClass: "+predictedClass);
   predictedClass.print();
 
- document.getElementById('result').innerHTML = "Billede: "+await predictedClass.data() +" fundet";
+  let max = predictedClass.max().dataSync();
+ document.getElementById('result').innerHTML = "Bedst match billede: "+ predictedClass.argMax().dataSync() 
+ +" match procent: "+max;
 
+ if(max <= 0.99){
+  document.getElementById('error').innerHTML = "Match procent ikke høj nok!!!"
+ }
 }
 
 const filesElement = document.getElementById('files');
