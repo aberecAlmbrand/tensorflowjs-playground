@@ -13,7 +13,7 @@ const IMAGES_PATH = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobil
 const IMAGES_PATH2 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/cars/";   
 const IMAGES_PATH3 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/house/";   
 
-const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
+const MODEL_SAVE_PATH_ = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
@@ -23,23 +23,6 @@ const controllerDataset = new ControllerDataset(NUM_CLASSES);
 
 let mobilenet;
 let model;
-
-
-async function traning(label){
-  await tf.tidy(() => {
-    console.log("started => "+label);
-    status("started => "+label);
-
-         const img = webcam.capture();
-         controllerDataset.addExample(mobilenet.predict(img), label);
-
-         // Draw the preview thumbnail.
-         drawThumb(img, label);
-  });
-
-  console.log("done => "+label);
-  status("done => "+label);
-}
 
 
 async function loadImage(imageUrl) {
@@ -129,16 +112,11 @@ const mobilenetDemo = async () => {
 };
 
 async function saveModel() {
-  return await model.save(MODEL_SAVE_PATH_);
+  return await model.save(tf.io.browserHTTPRequest(MODEL_SAVE_PATH_,{method: 'PUT'})); 
 }
 
 
 function drawThumb(img, label) {
-  /*if (thumbDisplayed[label] == null) {
-    const thumbCanvas = document.getElementById(CONTROLS[label] + '-thumb');
-    draw(img, thumbCanvas);
-  }*/
-
   const thumbCanvas = document.getElementById('my-thumb-'+label);
   draw(img, thumbCanvas);
 }
