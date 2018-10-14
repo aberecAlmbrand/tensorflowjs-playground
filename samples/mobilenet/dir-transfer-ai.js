@@ -25,6 +25,9 @@ const controllerDataset = new ControllerDataset(NUM_CLASSES);
 let mobilenet;
 let model;
 
+const storedModelStatusInput = document.getElementById('stored-model-status');
+const deleteStoredModelButton = document.getElementById('delete-stored-model');
+
 
 async function loadImage(imageUrl) {
   const img = new Image();
@@ -44,9 +47,6 @@ async function loadImage(imageUrl) {
 const mobilenetDemo = async () => {
   status('Loading model...');
 
-  document.addEventListener("DOMContentLoaded", async function(){
-    const storedModelStatusInput = document.getElementById('stored-model-status');
-    const deleteStoredModelButton = document.getElementById('delete-stored-model');
     deleteStoredModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to delete the locally-stored model?`)) {
           removeModel();
@@ -93,7 +93,7 @@ const mobilenetDemo = async () => {
       await train();
     }
 
-  });
+  
 };
 
 
@@ -209,9 +209,14 @@ async function train() {
       },
       onTrainEnd: async () =>{
           //gem model
-          saveModel().then((result) =>{
-            const saveResult = result;
-            console.log(saveResult);
+          saveModel().then(async(result) =>{
+            console.log(result);
+            let modelStatus = await checkStoredModelStatus();
+            if (modelStatus != null) {
+              status('Loaded network from IndexedDB.');
+              storedModelStatusInput.value = `Saved@${modelStatus.dateSaved.toISOString()}`;
+              deleteStoredModelButton.disabled = false;
+            }
           });
       }
     }
@@ -306,7 +311,24 @@ async function removeModel() {
   return await tf.io.removeModel(MODEL_SAVE_PATH_);
 }
 
-
+/**
+ * Get a representation of the sizes of the LSTM layers in the model.
+ *
+ * @returns {number | number[]} The sizes (i.e., number of units) of the
+ *   LSTM layers that the model contains. If there is only one LSTM layer, a
+ *   single number is returned; else, an Array of numbers is returned.
+ */
+function lstmLayerSizes() {
+  if (this.model == null) {
+    throw new Error('Create model first.');
+  }
+  const numLSTMLayers = this.model.layers.length - 1;
+  const layerSizes = [];
+  for (let i = 0; i < numLSTMLayers; ++i) {
+    layerSizes.push(this.model.layers[i].units);
+  }
+  return layerSizes.length === 1 ? layerSizes[0] : layerSizes;
+}
 
 
 const demoStatusElement = document.getElementById('status');
