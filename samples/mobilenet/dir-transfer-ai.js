@@ -18,6 +18,8 @@ const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
+const DIR_SIZE = [36, 9, 11];
+const LABELS = ["0", "1", "2"]
 
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
@@ -53,6 +55,9 @@ const mobilenetDemo = async () => {
       }
     });
 
+
+    await init();
+
     let modelStatus = await checkStoredModelStatus();
     if (modelStatus != null) {
       model = await loadModel();
@@ -66,37 +71,31 @@ const mobilenetDemo = async () => {
       storedModelStatusInput.value = 'No stored model.';
       deleteStoredModelButton.disabled = true;
 
-      await init();
-
-      for(let i=1; i<36; i++){
+      for(let i=1; i<DIR_SIZE[0]; i++){
         let image = await loadImage(IMAGES_PATH+"images ("+i+").jpg");
         const img = webcam.uploadImage(image);
-        controllerDataset.addExample(mobilenet.predict(img), "0");
-        drawThumb(img, "0");
+        controllerDataset.addExample(mobilenet.predict(img), LABELS[0]);
+        drawThumb(img, LABELS[0]);
       }
 
-      for(let i=1; i<9; i++){
+      for(let i=1; i<DIR_SIZE[1]; i++){
         let image = await loadImage(IMAGES_PATH2+"cars ("+i+").jpg");
         const img = webcam.uploadImage(image);
-        controllerDataset.addExample(mobilenet.predict(img), "1");
-        drawThumb(img, "1");
+        controllerDataset.addExample(mobilenet.predict(img), LABELS[1]);
+        drawThumb(img, LABELS[1]);
       }
 
-      for(let i=1; i<11; i++){
+      for(let i=1; i<DIR_SIZE[2]; i++){
         let image = await loadImage(IMAGES_PATH3+"house ("+i+").jpg");
         const img = webcam.uploadImage(image);
-        controllerDataset.addExample(mobilenet.predict(img), "2");
-        drawThumb(img, "2");
+        controllerDataset.addExample(mobilenet.predict(img), LABELS[2]);
+        drawThumb(img, LABELS[2]);
       }
 
       //træn netværk
       await train();
     }
-
-  
 };
-
-
 
 function drawThumb(img, label) {
   const thumbCanvas = document.getElementById('my-thumb-'+label);
@@ -333,7 +332,5 @@ function lstmLayerSizes() {
 
 const demoStatusElement = document.getElementById('status');
 const status = msg => demoStatusElement.innerText = msg;
-
-const predictionsElement = document.getElementById('predictions');
 
 mobilenetDemo();
