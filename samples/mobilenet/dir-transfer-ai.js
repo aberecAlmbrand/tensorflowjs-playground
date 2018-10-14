@@ -45,77 +45,57 @@ const mobilenetDemo = async () => {
   status('Loading model...');
 
   document.addEventListener("DOMContentLoaded", async function(){
-
-    await init();
-
-    for(let i=1; i<36; i++){
-      let image = await loadImage(IMAGES_PATH+"images ("+i+").jpg");
-      const img = webcam.uploadImage(image);
-      controllerDataset.addExample(mobilenet.predict(img), "0");
-      drawThumb(img, "0");
-    }
-
-    for(let i=1; i<9; i++){
-      let image = await loadImage(IMAGES_PATH2+"cars ("+i+").jpg");
-      const img = webcam.uploadImage(image);
-      controllerDataset.addExample(mobilenet.predict(img), "1");
-      drawThumb(img, "1");
-    }
-
-    for(let i=1; i<11; i++){
-      let image = await loadImage(IMAGES_PATH3+"house ("+i+").jpg");
-      const img = webcam.uploadImage(image);
-      controllerDataset.addExample(mobilenet.predict(img), "2");
-      drawThumb(img, "2");
-    }
-
-    //træn netværk
-    await train();
-
-    //gem model
-    saveModel().then((result) =>{
-        const saveResult = result;
-        console.log(saveResult);
+    const storedModelStatusInput = document.getElementById('stored-model-status');
+    const deleteStoredModelButton = document.getElementById('delete-stored-model');
+    deleteStoredModelButton.addEventListener('click', async () => {
+      if (confirm(`Are you sure you want to delete the locally-stored model?`)) {
+          removeModel();
+      }
     });
 
-    /*
-    let button = document.createElement('button');
-    button.innerHTML = 'Tilføj billeder 0';
-    button.onclick = function(){
-      traning(0);
-    }
-    document.getElementById('addImages').appendChild(button);
+    let modelStatus = await checkStoredModelStatus();
+    if (modelStatus != null) {
+      model = await loadModel();
+      status('Loaded network from IndexedDB.');
 
-    button = document.createElement('button');
-    button.innerHTML = 'Tilføj billeder 1';
-    button.onclick = function(){
-      traning(1);
+      storedModelStatusInput.value = `Saved@${modelStatus.dateSaved.toISOString()}`;
+      deleteStoredModelButton.disabled = false;
     }
-    document.getElementById('addImages2').appendChild(button);
+    else{
 
-    button = document.createElement('button');
-    button.innerHTML = 'Tilføj billeder 2';
-    button.onclick = function(){
-      traning(2);
+      storedModelStatusInput.value = 'No stored model.';
+      deleteStoredModelButton.disabled = true;
+
+      await init();
+
+      for(let i=1; i<36; i++){
+        let image = await loadImage(IMAGES_PATH+"images ("+i+").jpg");
+        const img = webcam.uploadImage(image);
+        controllerDataset.addExample(mobilenet.predict(img), "0");
+        drawThumb(img, "0");
+      }
+
+      for(let i=1; i<9; i++){
+        let image = await loadImage(IMAGES_PATH2+"cars ("+i+").jpg");
+        const img = webcam.uploadImage(image);
+        controllerDataset.addExample(mobilenet.predict(img), "1");
+        drawThumb(img, "1");
+      }
+
+      for(let i=1; i<11; i++){
+        let image = await loadImage(IMAGES_PATH3+"house ("+i+").jpg");
+        const img = webcam.uploadImage(image);
+        controllerDataset.addExample(mobilenet.predict(img), "2");
+        drawThumb(img, "2");
+      }
+
+      //træn netværk
+      await train();
     }
-    document.getElementById('addImages3').appendChild(button);
-
-    let button2 = document.createElement('button');
-    button2.innerHTML = 'Træn neural netværk';
-    button2.onclick = function(){
-       train();
-    }
-    document.getElementById('train').appendChild(button2);**/
-
-    document.getElementById('file-container').style.display = '';
 
   });
 };
 
-async function saveModel() {
-  //return await model.save(tf.io.browserHTTPRequest(MODEL_SAVE_PATH_,{method: 'PUT'})); 
-  return await model.save(MODEL_SAVE_PATH_); 
-}
 
 
 function drawThumb(img, label) {
@@ -226,6 +206,13 @@ async function train() {
       onBatchEnd: async (batch, logs) => {
         console.log('Loss: ' + logs.loss.toFixed(5));
         status('Træner netværk => Loss: ' + logs.loss.toFixed(5));
+      },
+      onTrainEnd: async () =>{
+          //gem model
+          saveModel().then((result) =>{
+            const saveResult = result;
+            console.log(saveResult);
+          });
       }
     }
   });
@@ -290,6 +277,37 @@ filesElement.addEventListener('change', evt => {
     reader.readAsDataURL(f);
   }
 });
+
+
+
+async function loadModel() {
+  const modelsInfo = await tf.io.listModels();
+  if (MODEL_SAVE_PATH_ in modelsInfo) {
+    console.log(`Loading existing model...`);
+    const model = await tf.loadModel(MODEL_SAVE_PATH_);
+    console.log(`Loaded model from ${MODEL_SAVE_PATH_}`);
+    return model;
+  } else {
+    throw new Error(`Cannot find model at ${MODEL_SAVE_PATH_}.`);
+  }
+}
+
+async function saveModel() {
+  return await model.save(MODEL_SAVE_PATH_);
+}
+
+
+async function checkStoredModelStatus() {
+  const modelsInfo = await tf.io.listModels();
+  return modelsInfo[MODEL_SAVE_PATH_];
+}
+
+async function removeModel() {
+  return await tf.io.removeModel(MODEL_SAVE_PATH_);
+}
+
+
+
 
 const demoStatusElement = document.getElementById('status');
 const status = msg => demoStatusElement.innerText = msg;
