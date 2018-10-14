@@ -18,7 +18,7 @@ const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
-const DIR_SIZE = [36, 9, 11];
+const DIR_SIZE = [36, 12, 11];
 const LABELS = ["0", "1", "2"]
 
 // The dataset object where we will store activations.
@@ -29,6 +29,7 @@ let model;
 
 const storedModelStatusInput = document.getElementById('stored-model-status');
 const deleteStoredModelButton = document.getElementById('delete-stored-model');
+const learnStoredModelButton = document.getElementById('learn-stored-model');
 
 
 async function loadImage(imageUrl) {
@@ -52,6 +53,17 @@ const mobilenetDemo = async () => {
     deleteStoredModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to delete the locally-stored model?`)) {
           removeModel();
+          storedModelStatusInput.value = 'No stored model.';
+          deleteStoredModelButton.disabled = true;
+          learnStoredModelButton.disabled = false;
+      }
+    });
+
+    learnStoredModelButton.addEventListener('click', async () => {
+      if (confirm(`Are you sure you want to learn to the locally-stored model?`)) {
+          removeModel();
+
+          learn();
       }
     });
 
@@ -65,37 +77,43 @@ const mobilenetDemo = async () => {
 
       storedModelStatusInput.value = `Saved@${modelStatus.dateSaved.toISOString()}`;
       deleteStoredModelButton.disabled = false;
+      learnStoredModelButton.disabled = true;
     }
     else{
-
-      storedModelStatusInput.value = 'No stored model.';
-      deleteStoredModelButton.disabled = true;
-
-      for(let i=1; i<DIR_SIZE[0]; i++){
-        let image = await loadImage(IMAGES_PATH+"images ("+i+").jpg");
-        const img = webcam.uploadImage(image);
-        controllerDataset.addExample(mobilenet.predict(img), LABELS[0]);
-        drawThumb(img, LABELS[0]);
-      }
-
-      for(let i=1; i<DIR_SIZE[1]; i++){
-        let image = await loadImage(IMAGES_PATH2+"cars ("+i+").jpg");
-        const img = webcam.uploadImage(image);
-        controllerDataset.addExample(mobilenet.predict(img), LABELS[1]);
-        drawThumb(img, LABELS[1]);
-      }
-
-      for(let i=1; i<DIR_SIZE[2]; i++){
-        let image = await loadImage(IMAGES_PATH3+"house ("+i+").jpg");
-        const img = webcam.uploadImage(image);
-        controllerDataset.addExample(mobilenet.predict(img), LABELS[2]);
-        drawThumb(img, LABELS[2]);
-      }
-
-      //træn netværk
-      await train();
+      learn();
     }
 };
+
+async function learn(){
+
+  storedModelStatusInput.value = 'No stored model.';
+  deleteStoredModelButton.disabled = true;
+  learnStoredModelButton.disabled = false;
+
+    for(let i=1; i<DIR_SIZE[0]; i++){
+      let image = await loadImage(IMAGES_PATH+"images ("+i+").jpg");
+      const img = webcam.uploadImage(image);
+      controllerDataset.addExample(mobilenet.predict(img), LABELS[0]);
+      drawThumb(img, LABELS[0]);
+    }
+
+    for(let i=1; i<DIR_SIZE[1]; i++){
+      let image = await loadImage(IMAGES_PATH2+"cars ("+i+").jpg");
+      const img = webcam.uploadImage(image);
+      controllerDataset.addExample(mobilenet.predict(img), LABELS[1]);
+      drawThumb(img, LABELS[1]);
+    }
+
+    for(let i=1; i<DIR_SIZE[2]; i++){
+      let image = await loadImage(IMAGES_PATH3+"house ("+i+").jpg");
+      const img = webcam.uploadImage(image);
+      controllerDataset.addExample(mobilenet.predict(img), LABELS[2]);
+      drawThumb(img, LABELS[2]);
+    }
+
+    //træn netværk
+    await train();
+}
 
 function drawThumb(img, label) {
   const thumbCanvas = document.getElementById('my-thumb-'+label);
@@ -215,6 +233,7 @@ async function train() {
               status('Loaded network from IndexedDB.');
               storedModelStatusInput.value = `Saved@${modelStatus.dateSaved.toISOString()}`;
               deleteStoredModelButton.disabled = false;
+              learnStoredModelButton.disabled = true;
             }
           });
       }

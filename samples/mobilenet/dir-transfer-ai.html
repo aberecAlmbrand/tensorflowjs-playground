@@ -8,30 +8,18 @@
   body {
     margin: 20px;
   }
+  
   .input-div {
     padding: 5px;
     font-family: monospace;
   }
-  a {
-    color: blue;
-  }
 
-  p {
-    width: 500px;
-  }
 
   #status {
     margin-top: 30px;
     font-size: 20px;
   }
-  .pred-container {
-    margin-bottom: 20px;
-  }
-  .pred-container > div {
-    display: inline-block;
-    margin-right: 20px;
-    vertical-align: top;
-  }
+
 
 </style>
 
@@ -42,17 +30,20 @@
       <h3>Genkendelse af billeder</h3>
       
 
-      <div class="input-div">
+      <div class="input-div mb-4">
         <span class="input-label">Locally-stored network</span>
         <input id="stored-model-status" value="N/A" disabled="true" readonly="true"></input>
-        <button id="delete-stored-model" disabled="true">Delete</button>
+        <button id="delete-stored-model" visible="true">Delete</button>
+        <button id="learn-stored-model" visible="true">Learn</button>
       </div>
 
+      
       <div class="webcam-box-outer" style="display: none">
           <div class="webcam-box-inner">
             <video autoplay playsinline muted id="webcam" width="224" height="224"></video>
           </div>
         </div>
+      
 
         <div class="row mb-5">
           <div class="col-4">
