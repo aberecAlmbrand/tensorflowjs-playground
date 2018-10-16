@@ -16,7 +16,7 @@ const IMAGES_PATH3 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobi
 
 const LOCAL_MODEL_SAVE_PATH_ = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/model/dir-transfer-ai-model-1.json";
 const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
-//const MODEL_SAVE_PATH_ = "downloads://dir-transfer-ai-model-1";
+const SAVE_LOCAL_MODEL_TO_PATH_ = "downloads://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
@@ -34,6 +34,7 @@ let storedModelStatusInput = document.getElementById('stored-model-status');
 let deleteStoredModelButton = document.getElementById('delete-stored-model');
 let learnStoredModelButton = document.getElementById('learn-stored-model');
 let loadLocalModelButton = document.getElementById('load-local-model');
+let saveLocalModelButton = document.getElementById('save-local-model');
 
 
 async function loadImage(imageUrl) {
@@ -74,6 +75,10 @@ const mobilenetDemo = async () => {
       if (confirm(`Are you sure you want to load the locally-stored model?`)) {
         model = await loadLocalModel();
       }
+    });
+
+    saveLocalModelButton.addEventListener('click', async () => {
+      await model.save(SAVE_LOCAL_MODEL_TO_PATH_);
     });
 
 
@@ -230,7 +235,7 @@ async function train() {
             console.log(result);
             let modelStatus = await checkStoredModelStatus();
             if (modelStatus != null) {
-              status('Loaded network from IndexedDB.');
+              status('Saved network to IndexedDB.');
               storedModelStatusInput.value = `Saved@${modelStatus.dateSaved.toISOString()}`;
               deleteStoredModelButton.disabled = false;
               learnStoredModelButton.disabled = true;

@@ -30,12 +30,17 @@
       <h3>Genkendelse af billeder</h3>
       
 
-      <div class="input-div mb-4">
+      <div class="input-div">
         <span class="input-label">Locally-stored network</span>
-        <input id="stored-model-status" value="N/A" disabled="true" readonly="true" size="40" class="mb-3"></input>
-        <button id="delete-stored-model" visible="true">Delete model</button>
-        <button id="learn-stored-model" visible="true">Learn neural net</button>
-        <button id="load-local-model" visible="true">Load local model</button>
+        <input id="stored-model-status" value="N/A" disabled="true" readonly="true" size="40"></input>
+      </div>
+      <div class="input-div mb-2">
+          <button id="delete-stored-model" visible="true">Delete model</button>
+          <button id="learn-stored-model" visible="true">Learn neural net</button>
+      </div>  
+      <div class="input-div mb-4">
+          <button id="load-local-model" visible="true">Load local model</button>
+          <button id="save-local-model" visible="true">Save to local model</button>
       </div>
 
       
