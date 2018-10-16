@@ -32,7 +32,7 @@
 
       <div class="input-div mb-4">
         <span class="input-label">Locally-stored network</span>
-        <input id="stored-model-status" value="N/A" disabled="true" readonly="true"></input>
+        <input id="stored-model-status" value="N/A" disabled="true" readonly="true" size="40" class="mb-3"></input>
         <button id="delete-stored-model" visible="true">Delete model</button>
         <button id="learn-stored-model" visible="true">Learn neural net</button>
         <button id="load-local-model" visible="true">Load local model</button>
@@ -48,24 +48,19 @@
 
         <div class="row mb-5">
           <div class="col-4">
-            <p>Billede 0</p>
+            <p>Billede[KØREKORT]</p>
             <canvas class="thumb" width=224 height=224 id="my-thumb-0"></canvas>
-            <div id="addImages"></div>
           </div>
           <div class="col-4">
-              <p>Billede 1</p>
+              <p>Billede[BIL]</p>
             <canvas class="thumb" width=224 height=224 id="my-thumb-1"></canvas>
-            <div id="addImages2"></div>
           </div>
           <div class="col-4">
-              <p>Billede 2</p>
+              <p>Billede[HUS]</p>
             <canvas class="thumb" width=224 height=224 id="my-thumb-2"></canvas>
-            <div id="addImages3"></div>
           </div>  
         </div>
-        <!--
-        <div id="train" class="mb-4"></div>
-        -->
+
         <div id="status"></div>
  
         <h5 id="result" class="mb-4"></h5>

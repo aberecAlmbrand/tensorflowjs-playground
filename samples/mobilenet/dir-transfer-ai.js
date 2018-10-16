@@ -21,7 +21,8 @@ const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
 const DIR_SIZE = [36, 12, 18];
-const LABELS = ["0", "1", "2"]
+const LABELS = ["0", "1", "2"];
+const DESC_WRAPPER = ["KØREKORT", "BIL", "HUS"];
 
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
@@ -56,6 +57,7 @@ const mobilenetDemo = async () => {
     deleteStoredModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to delete the locally-stored model?`)) {
           await removeModel();
+
           storedModelStatusInput.value = 'No stored model.';
           deleteStoredModelButton.disabled = true;
           learnStoredModelButton.disabled = false;
@@ -142,12 +144,6 @@ function draw(image, canvas) {
 
 
 async function init() {
-  /*try {
-    await webcam.setup();
-  } catch (e) {
-    document.getElementById('no-webcam').style.display = 'block';
-  }*/
-  
   mobilenet = await loadMobilenet();
 
   // Warm up the model. This uploads weights to the GPU and compiles the WebGL
@@ -271,8 +267,8 @@ async function predict(img) {
   predictedClass.print();
 
   let max = predictedClass.max().dataSync();
- document.getElementById('result').innerHTML = "Bedst match billede: "+ predictedClass.argMax().dataSync() 
- +" match procent: "+max;
+ document.getElementById('result').innerHTML = 
+ "Bedst match billede: "+ DESC_WRAPPER[predictedClass.argMax().dataSync()] +" match procent: "+max;
 
  if(max <= 0.99){
   document.getElementById('error').innerHTML = "Match procent ikke høj nok!!!"
@@ -321,6 +317,7 @@ async function loadLocalModel() {
     console.log(`Loading existing model...`);
     const model = await tf.loadModel(LOCAL_MODEL_SAVE_PATH_);
     console.log(`Loaded model from ${LOCAL_MODEL_SAVE_PATH_}`);
+    storedModelStatusInput.value = ''+LOCAL_MODEL_SAVE_PATH_;
     return model;
 }
 
