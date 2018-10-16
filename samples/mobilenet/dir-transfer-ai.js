@@ -6,15 +6,16 @@ import {Webcam} from './webcam';
 
 const webcam = new Webcam(document.getElementById('webcam'));
 
-const MOBILENET_MODEL_PATH =
-    'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
+const MOBILENET_MODEL_PATH ='https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
+//const MOBILENET_MODEL_PATH ='http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/mobilenet_v1_0.25_224.json';
 
 const IMAGES_PATH = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/koerekort/";    
 const IMAGES_PATH2 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/cars/";   
 const IMAGES_PATH3 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/house/";   
 
-//const MODEL_SAVE_PATH_ = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/dir-transfer-ai-model-1";
+//const MODEL_SAVE_PATH_ = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/model/dir-transfer-ai-model-1";
 const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
+//const MODEL_SAVE_PATH_ = "downloads://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
@@ -62,7 +63,6 @@ const mobilenetDemo = async () => {
     learnStoredModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to learn to the locally-stored model?`)) {
           removeModel();
-
           learn();
       }
     });
@@ -71,16 +71,14 @@ const mobilenetDemo = async () => {
     await init();
 
     let modelStatus = await checkStoredModelStatus();
-    if (modelStatus != null) {
-      model = await loadModel();
+    if (modelStatus !== null) {
       status('Loaded network from IndexedDB.');
 
       storedModelStatusInput.value = `Saved@${modelStatus.dateSaved.toISOString()}`;
       deleteStoredModelButton.disabled = false;
       learnStoredModelButton.disabled = true;
-    }
-    else{
-      learn();
+
+      model = await loadModel();
     }
 };
 
