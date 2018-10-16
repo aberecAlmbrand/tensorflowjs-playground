@@ -18,7 +18,7 @@ const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 3;
-const DIR_SIZE = [36, 12, 11];
+const DIR_SIZE = [36, 12, 18];
 const LABELS = ["0", "1", "2"]
 
 // The dataset object where we will store activations.
@@ -90,21 +90,21 @@ async function learn(){
   deleteStoredModelButton.disabled = true;
   learnStoredModelButton.disabled = false;
 
-    for(let i=1; i<DIR_SIZE[0]; i++){
+    for(let i=1; i<=DIR_SIZE[0]; i++){
       let image = await loadImage(IMAGES_PATH+"images ("+i+").jpg");
       const img = webcam.uploadImage(image);
       controllerDataset.addExample(mobilenet.predict(img), LABELS[0]);
       drawThumb(img, LABELS[0]);
     }
 
-    for(let i=1; i<DIR_SIZE[1]; i++){
+    for(let i=1; i<=DIR_SIZE[1]; i++){
       let image = await loadImage(IMAGES_PATH2+"cars ("+i+").jpg");
       const img = webcam.uploadImage(image);
       controllerDataset.addExample(mobilenet.predict(img), LABELS[1]);
       drawThumb(img, LABELS[1]);
     }
 
-    for(let i=1; i<DIR_SIZE[2]; i++){
+    for(let i=1; i<=DIR_SIZE[2]; i++){
       let image = await loadImage(IMAGES_PATH3+"house ("+i+").jpg");
       const img = webcam.uploadImage(image);
       controllerDataset.addExample(mobilenet.predict(img), LABELS[2]);
