@@ -28,9 +28,9 @@ const controllerDataset = new ControllerDataset(NUM_CLASSES);
 let mobilenet;
 let model;
 
-const storedModelStatusInput = document.getElementById('stored-model-status');
-const deleteStoredModelButton = document.getElementById('delete-stored-model');
-const learnStoredModelButton = document.getElementById('learn-stored-model');
+let storedModelStatusInput = document.getElementById('stored-model-status');
+let deleteStoredModelButton = document.getElementById('delete-stored-model');
+let learnStoredModelButton = document.getElementById('learn-stored-model');
 
 
 async function loadImage(imageUrl) {
@@ -53,7 +53,7 @@ const mobilenetDemo = async () => {
 
     deleteStoredModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to delete the locally-stored model?`)) {
-          removeModel();
+          await removeModel();
           storedModelStatusInput.value = 'No stored model.';
           deleteStoredModelButton.disabled = true;
           learnStoredModelButton.disabled = false;
@@ -62,7 +62,6 @@ const mobilenetDemo = async () => {
 
     learnStoredModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to learn to the locally-stored model?`)) {
-          removeModel();
           learn();
       }
     });
@@ -324,6 +323,9 @@ async function checkStoredModelStatus() {
 }
 
 async function removeModel() {
+  if(await checkStoredModelStatus() === null){
+    return;
+  }
   return await tf.io.removeModel(MODEL_SAVE_PATH_);
 }
 
