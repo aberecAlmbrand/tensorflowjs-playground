@@ -13,7 +13,7 @@ const IMAGES_PATH = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobil
 const IMAGES_PATH2 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/cars/";   
 const IMAGES_PATH3 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/house/";   
 
-//const MODEL_SAVE_PATH_ = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/model/dir-transfer-ai-model-1";
+const LOCAL_MODEL_SAVE_PATH_ = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/model/dir-transfer-ai-model-1.json";
 const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 //const MODEL_SAVE_PATH_ = "downloads://dir-transfer-ai-model-1";
 
@@ -31,6 +31,7 @@ let model;
 let storedModelStatusInput = document.getElementById('stored-model-status');
 let deleteStoredModelButton = document.getElementById('delete-stored-model');
 let learnStoredModelButton = document.getElementById('learn-stored-model');
+let loadLocalModelButton = document.getElementById('load-local-model');
 
 
 async function loadImage(imageUrl) {
@@ -63,6 +64,12 @@ const mobilenetDemo = async () => {
     learnStoredModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to learn to the locally-stored model?`)) {
           learn();
+      }
+    });
+
+    loadLocalModelButton.addEventListener('click', async () => {
+      if (confirm(`Are you sure you want to load the locally-stored model?`)) {
+        model = await loadLocalModel();
       }
     });
 
@@ -157,7 +164,6 @@ async function loadMobilenet() {
   const layer = mobilenet.getLayer('conv_pw_13_relu');
   return tf.model({inputs: mobilenet.inputs, outputs: layer.output});
 }
-
 
 /**
  * Sets up and trains the classifier.
@@ -298,8 +304,6 @@ filesElement.addEventListener('change', evt => {
   }
 });
 
-
-
 async function loadModel() {
   const modelsInfo = await tf.io.listModels();
   if (MODEL_SAVE_PATH_ in modelsInfo) {
@@ -308,14 +312,20 @@ async function loadModel() {
     console.log(`Loaded model from ${MODEL_SAVE_PATH_}`);
     return model;
   } else {
-    throw new Error(`Cannot find model at ${MODEL_SAVE_PATH_}.`);
+    //throw new Error(`Cannot find model at ${MODEL_SAVE_PATH_}.`);
   }
+}
+
+async function loadLocalModel() {
+    console.log(`Loading existing model...`);
+    const model = await tf.loadModel(LOCAL_MODEL_SAVE_PATH_);
+    console.log(`Loaded model from ${LOCAL_MODEL_SAVE_PATH_}`);
+    return model;
 }
 
 async function saveModel() {
   return await model.save(MODEL_SAVE_PATH_);
 }
-
 
 async function checkStoredModelStatus() {
   const modelsInfo = await tf.io.listModels();
@@ -328,26 +338,6 @@ async function removeModel() {
   }
   return await tf.io.removeModel(MODEL_SAVE_PATH_);
 }
-
-/**
- * Get a representation of the sizes of the LSTM layers in the model.
- *
- * @returns {number | number[]} The sizes (i.e., number of units) of the
- *   LSTM layers that the model contains. If there is only one LSTM layer, a
- *   single number is returned; else, an Array of numbers is returned.
- */
-function lstmLayerSizes() {
-  if (this.model == null) {
-    throw new Error('Create model first.');
-  }
-  const numLSTMLayers = this.model.layers.length - 1;
-  const layerSizes = [];
-  for (let i = 0; i < numLSTMLayers; ++i) {
-    layerSizes.push(this.model.layers[i].units);
-  }
-  return layerSizes.length === 1 ? layerSizes[0] : layerSizes;
-}
-
 
 const demoStatusElement = document.getElementById('status');
 const status = msg => demoStatusElement.innerText = msg;
