@@ -2,6 +2,7 @@ import * as tf from '@tensorflow/tfjs';
 
 import {ControllerDataset} from './controller_dataset';
 import {Webcam} from './webcam';
+import { isNullOrUndefined } from 'util';
 
 
 const webcam = new Webcam(document.getElementById('webcam'));
@@ -77,7 +78,7 @@ const mobilenetDemo = async () => {
     await init();
 
     let modelStatus = await checkStoredModelStatus();
-    if (modelStatus !== null) {
+    if (!isNullOrUndefined(modelStatus)) {
       status('Loaded network from IndexedDB.');
 
       storedModelStatusInput.value = `Saved@${modelStatus.dateSaved.toISOString()}`;
