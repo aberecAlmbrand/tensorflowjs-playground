@@ -37,6 +37,7 @@
       <div class="input-div mb-2">
           <button id="delete-stored-model" visible="true">Delete model</button>
           <button id="learn-stored-model" visible="true">Learn neural net</button>
+          <button id="relearn-stored-model" visible="true">Relearn neural net</button>
       </div>  
       <div class="input-div mb-4">
           <button id="load-local-model" visible="true">Load local model</button>
@@ -52,18 +53,22 @@
       
 
         <div class="row mb-5">
-          <div class="col-4">
+          <div class="col-3">
             <p>Billede[KØREKORT]</p>
             <canvas class="thumb" width=224 height=224 id="my-thumb-0"></canvas>
           </div>
-          <div class="col-4">
+          <div class="col-3">
               <p>Billede[BIL]</p>
             <canvas class="thumb" width=224 height=224 id="my-thumb-1"></canvas>
           </div>
-          <div class="col-4">
+          <div class="col-3">
               <p>Billede[HUS]</p>
             <canvas class="thumb" width=224 height=224 id="my-thumb-2"></canvas>
           </div>  
+          <div class="col-3">
+            <p>Billede[CYKEL]</p>
+          <canvas class="thumb" width=224 height=224 id="my-thumb-3"></canvas>
+        </div>  
         </div>
 
         <div id="status"></div>

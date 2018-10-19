@@ -12,17 +12,18 @@ const MOBILENET_MODEL_PATH ='https://storage.googleapis.com/tfjs-models/tfjs/mob
 
 const IMAGES_PATH = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/koerekort/";    
 const IMAGES_PATH2 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/cars/";   
-const IMAGES_PATH3 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/house/";   
+const IMAGES_PATH3 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/house/";  
+const IMAGES_PATH4 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/bicycle/";    
 
 const LOCAL_MODEL_SAVE_PATH_ = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/model/dir-transfer-ai-model-1.json";
 const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 const SAVE_LOCAL_MODEL_TO_PATH_ = "downloads://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
-const NUM_CLASSES = 3;
-const DIR_SIZE = [36, 12, 18];
-const LABELS = ["0", "1", "2"];
-const DESC_WRAPPER = ["KØREKORT", "BIL", "HUS"];
+const NUM_CLASSES = 4;
+const DIR_SIZE = [36, 12, 18, 12];
+const LABELS = ["0", "1", "2", "3"];
+const DESC_WRAPPER = ["KØREKORT", "BIL", "HUS", "BYCYCLE"];
 
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
@@ -33,6 +34,7 @@ let model;
 let storedModelStatusInput = document.getElementById('stored-model-status');
 let deleteStoredModelButton = document.getElementById('delete-stored-model');
 let learnStoredModelButton = document.getElementById('learn-stored-model');
+let relearnStoredModelButton = document.getElementById('relearn-stored-model');
 let loadLocalModelButton = document.getElementById('load-local-model');
 let saveLocalModelButton = document.getElementById('save-local-model');
 
@@ -71,6 +73,12 @@ const mobilenetDemo = async () => {
       }
     });
 
+    relearnStoredModelButton.addEventListener('click', async () => {
+      if (confirm(`Are you sure you want to relearn to the locally-stored model?`)) {
+          reLearn();
+      }
+    });
+
     loadLocalModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to load the locally-stored model?`)) {
         model = await loadLocalModel();
@@ -95,6 +103,18 @@ const mobilenetDemo = async () => {
       model = await loadModel();
     }
 };
+
+async function reLearn(){
+  for(let i=1; i<=DIR_SIZE[3]; i++){
+    let image = await loadImage(IMAGES_PATH4+"images ("+i+").jpg");
+    const img = webcam.uploadImage(image);
+    controllerDataset.addExample(mobilenet.predict(img), LABELS[3]);
+    drawThumb(img, LABELS[3]);
+  }
+
+    //træn netværk
+    await train();
+}
 
 async function learn(){
 
