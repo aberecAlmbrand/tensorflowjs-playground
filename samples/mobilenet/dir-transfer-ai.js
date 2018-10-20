@@ -27,6 +27,7 @@ const DESC_WRAPPER = ["KØREKORT", "BIL", "HUS", "BYCYCLE"];
 
 // The dataset object where we will store activations.
 const controllerDataset = new ControllerDataset(NUM_CLASSES);
+const retraninedControllerDataset = new ControllerDataset(NUM_CLASSES);
 
 let mobilenet;
 let model;
@@ -108,12 +109,12 @@ async function reLearn(){
   for(let i=1; i<=DIR_SIZE[3]; i++){
     let image = await loadImage(IMAGES_PATH4+"images ("+i+").jpg");
     const img = webcam.uploadImage(image);
-    controllerDataset.addExample(mobilenet.predict(img), LABELS[3]);
+    retraninedControllerDataset.addExample(mobilenet.predict(img), LABELS[3]);
     drawThumb(img, LABELS[3]);
   }
 
     //træn netværk
-    await train();
+    await retrainModel();
 }
 
 async function learn(){
@@ -181,11 +182,49 @@ async function init() {
 // we'll use as input to our classifier model.
 async function loadMobilenet() {
   const mobilenet = await tf.loadModel(MOBILENET_MODEL_PATH);
-
+  
   // Return a model that outputs an internal activation.
   const layer = mobilenet.getLayer('conv_pw_13_relu');
   return tf.model({inputs: mobilenet.inputs, outputs: layer.output});
 }
+
+
+  // Perform retraining on the loaded model.
+async function retrainModel() {
+
+    await tf.nextFrame();
+
+    console.log('Freezing feature layers of the model.');
+    for (let i = 0; i < 3; ++i) {
+      //model.layers[i].trainable = false;
+    }
+    
+    model.compile({
+      loss: 'categoricalCrossentropy',
+      optimizer: 'Adam',
+      metrics: ['acc'],
+    });
+
+    console.log('Retraining model.');
+
+    //retraninedControllerDataset.xs.print();
+
+    const history =
+        await model.fit(retraninedControllerDataset.xs, retraninedControllerDataset.ys, {
+          batchSize: 128,
+          epochs: 20,
+          callbacks: {
+            onBatchEnd: async (batch, logs) => {
+              console.log('Loss: ' + logs.loss.toFixed(5));
+              status('Træner netværk => Loss: ' + logs.loss.toFixed(5));
+            },
+          }
+        });
+    console.log(history.history);
+    console.log('DONE retraining model');
+}
+
+
 
 /**
  * Sets up and trains the classifier.
@@ -204,7 +243,6 @@ async function train() {
       // technically a layer, this only performs a reshape (and has no training
       // parameters).
       tf.layers.flatten({inputShape: [7, 7, 256]}),
-      //tf.layers.flatten({inputShape: [224,224,3]}),
       // Layer 1
       tf.layers.dense({
         units: 100,
