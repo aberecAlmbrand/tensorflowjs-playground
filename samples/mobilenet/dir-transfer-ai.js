@@ -43,24 +43,38 @@ let relearnStoredModelButton = document.getElementById('relearn-stored-model');
 let loadLocalModelButton = document.getElementById('load-local-model');
 let saveLocalModelButton = document.getElementById('save-local-model');
 
+let filesElement = document.getElementById('files');
 
-async function loadImage(imageUrl) {
-  const img = new Image();
-  const promise = new Promise((resolve, reject) => {
-    img.crossOrigin = '';
-    img.width = IMAGE_SIZE;
-    img.height = IMAGE_SIZE;
-    img.onload = () => {
-      resolve(img);
-    };
-  });
 
-  img.src = imageUrl;
-  return promise;
-}
+
 
 const mobilenetDemo = async () => {
   status('Loading model...');
+
+    filesElement.addEventListener('change', evt => {
+      let files = evt.target.files;
+      // Display thumbnails & issue call to predict each image.
+      for (let i = 0, f; f = files[i]; i++) {
+        // Only process image files (skip non image files)
+        if (!f.type.match('image.*')) {
+          continue;
+        }
+        let reader = new FileReader();
+        const idx = i;
+        // Closure to capture the file information.
+        reader.onload = e => {
+          // Fill the image & call predict.
+          let img = document.createElement('img');
+          img.src = e.target.result;
+          img.width = IMAGE_SIZE;
+          img.height = IMAGE_SIZE;
+          img.onload = () => predict(img);
+        };
+
+        // Read in the image file as a data URL.
+        reader.readAsDataURL(f);
+      }
+    });
 
     deleteStoredModelButton.addEventListener('click', async () => {
       if (confirm(`Are you sure you want to delete the locally-stored model?`)) {
@@ -152,7 +166,6 @@ async function learnBigData(){
 }
 
 async function learn(){
-
   storedModelStatusInput.value = 'No stored model.';
   deleteStoredModelButton.disabled = true;
   learnStoredModelButton.disabled = false;
@@ -200,6 +213,21 @@ function draw(image, canvas) {
     imageData.data[j + 3] = 255;
   }
   ctx.putImageData(imageData, 0, 0);
+}
+
+async function loadImage(imageUrl) {
+  const img = new Image();
+  const promise = new Promise((resolve, reject) => {
+    img.crossOrigin = '';
+    img.width = IMAGE_SIZE;
+    img.height = IMAGE_SIZE;
+    img.onload = () => {
+      resolve(img);
+    };
+  });
+
+  img.src = imageUrl;
+  return promise;
 }
 
 
@@ -372,31 +400,35 @@ async function predict(img) {
  }
 }
 
-const filesElement = document.getElementById('files');
-filesElement.addEventListener('change', evt => {
-  let files = evt.target.files;
-  // Display thumbnails & issue call to predict each image.
-  for (let i = 0, f; f = files[i]; i++) {
-    // Only process image files (skip non image files)
-    if (!f.type.match('image.*')) {
-      continue;
-    }
-    let reader = new FileReader();
-    const idx = i;
-    // Closure to capture the file information.
-    reader.onload = e => {
-      // Fill the image & call predict.
-      let img = document.createElement('img');
-      img.src = e.target.result;
-      img.width = IMAGE_SIZE;
-      img.height = IMAGE_SIZE;
-      img.onload = () => predict(img);
-    };
+async function evaluate(){
 
-    // Read in the image file as a data URL.
-    reader.readAsDataURL(f);
-  }
-});
+  tf.tidy(() => {
+    const result =
+        model.evaluate(testData.data, testData.target, {batchSize: batchSize});
+/*
+    const testLoss = result[0].get();
+    const testAcc = result[1].get();
+
+    const probs = model.predict(testData.data);
+    const predictions = utils.binarize(probs).as1D();
+
+    const precision = tf.metrics.precision(testData.target, predictions).get();
+    const recall = tf.metrics.recall(testData.target, predictions).get();
+    const fpr = falsePositiveRate(testData.target, predictions).get();
+    ui.updateStatus(
+        `Final train-set loss: ${trainLoss.toFixed(4)} accuracy: ${
+            trainAcc.toFixed(4)}\n` +
+        `Final validation-set loss: ${valLoss.toFixed(4)} accuracy: ${
+            valAcc.toFixed(4)}\n` +
+        `Test-set loss: ${testLoss.toFixed(4)} accuracy: ${
+            testAcc.toFixed(4)}\n` +
+        `Precision: ${precision.toFixed(4)}\n` +
+        `Recall: ${recall.toFixed(4)}\n` +
+        `False positive rate (FPR): ${fpr.toFixed(4)}\n` + 
+        `Area under the curve (AUC): ${auc.toFixed(4)}`);*/
+  });
+
+}
 
 async function loadModel() {
   const modelsInfo = await tf.io.listModels();
