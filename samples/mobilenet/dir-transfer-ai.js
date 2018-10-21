@@ -23,8 +23,8 @@ const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 const SAVE_LOCAL_MODEL_TO_PATH_ = "downloads://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
-const NUM_CLASSES = 4;
-const DIR_SIZE = [36, 12, 18, 12, 500, 500];
+const NUM_CLASSES = 6;
+const DIR_SIZE = [36, 12, 18, 12, 50, 50];
 const LABELS = ["0", "1", "2", "3", "4", "5"];
 const DESC_WRAPPER = ["KØREKORT", "BIL", "HUS", "BYCYCLE", "CAT", "DOG"];
 
