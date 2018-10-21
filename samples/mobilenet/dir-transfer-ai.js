@@ -18,19 +18,22 @@ const IMAGES_PATH4 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobi
 const IMAGES_PATH5 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/dataset/training_set/cats/";    
 const IMAGES_PATH6 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/dataset/training_set/dogs/";   
 
+const IMAGES_PATH7 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/dataset/test_set/cats/";    
+const IMAGES_PATH8 = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/dataset/test_set/dogs/"; 
+
 const LOCAL_MODEL_SAVE_PATH_ = "http://127.0.0.1:5500/tensorflowjs-playground/samples/mobilenet/data/model/dir-transfer-ai-model-1.json";
 const MODEL_SAVE_PATH_ = "indexeddb://dir-transfer-ai-model-1";
 const SAVE_LOCAL_MODEL_TO_PATH_ = "downloads://dir-transfer-ai-model-1";
 
 const IMAGE_SIZE = 224;
 const NUM_CLASSES = 6;
-const DIR_SIZE = [36, 12, 18, 12, 50, 50];
-const LABELS = ["0", "1", "2", "3", "4", "5"];
+const DIR_SIZE = [36, 12, 18, 12, 50, 50, 50, 50];
+const LABELS = ["0", "1", "2", "3", "4", "5", "6", "7"];
 const DESC_WRAPPER = ["KØREKORT", "BIL", "HUS", "BYCYCLE", "CAT", "DOG"];
 
 // The dataset object where we will store activations.
-const controllerDataset = new ControllerDataset(NUM_CLASSES);
-const retraninedControllerDataset = new ControllerDataset(NUM_CLASSES);
+let controllerDataset = new ControllerDataset(NUM_CLASSES);
+let retraninedControllerDataset = new ControllerDataset(NUM_CLASSES);
 
 let mobilenet;
 let model;
@@ -44,8 +47,6 @@ let loadLocalModelButton = document.getElementById('load-local-model');
 let saveLocalModelButton = document.getElementById('save-local-model');
 
 let filesElement = document.getElementById('files');
-
-
 
 
 const mobilenetDemo = async () => {
@@ -351,7 +352,7 @@ async function train() {
       },
       onTrainEnd: async () =>{
           //gem model
-          saveModel().then(async(result) =>{
+          /*saveModel().then(async(result) =>{
             console.log(result);
             let modelStatus = await checkStoredModelStatus();
             if (modelStatus != null) {
@@ -360,7 +361,9 @@ async function train() {
               deleteStoredModelButton.disabled = false;
               learnStoredModelButton.disabled = true;
             }
-          });
+          });*/
+
+          evaluate();
       }
     }
   });
@@ -402,13 +405,40 @@ async function predict(img) {
 
 async function evaluate(){
 
+  controllerDataset = new ControllerDataset(NUM_CLASSES);
+
+  for(let i=4001; i<=(DIR_SIZE[6]+4000); i++){
+    let image = await loadImage(IMAGES_PATH7+"cat."+i+".jpg");
+    const img = webcam.uploadImage(image);
+    controllerDataset.addExample(mobilenet.predict(img), LABELS[4]);
+  }
+
+  for(let i=4001; i<=(DIR_SIZE[7]+4000); i++){
+    let image = await loadImage(IMAGES_PATH8+"dog."+i+".jpg");
+    const img = webcam.uploadImage(image);
+    controllerDataset.addExample(mobilenet.predict(img), LABELS[5]);
+  }
+
+  const batchSize = Math.floor(controllerDataset.xs.shape[0] * 0.4);
+  if (!(batchSize > 0)) {
+    throw new Error(
+        `Batch size is 0 or NaN. Please choose a non-zero fraction.`);
+  }
+
+
   tf.tidy(() => {
     const result =
-        model.evaluate(testData.data, testData.target, {batchSize: batchSize});
-/*
-    const testLoss = result[0].get();
-    const testAcc = result[1].get();
+        model.evaluate(controllerDataset.xs, controllerDataset.ys, {batchSize: batchSize});
 
+    result.print();
+
+    //const testLoss = result[0].get();
+    //const testAcc = result[1].get();
+
+    //testLoss.print();    
+    //testAcc.print();
+
+/*
     const probs = model.predict(testData.data);
     const predictions = utils.binarize(probs).as1D();
 
